@@ -1,0 +1,98 @@
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 100 1000;
+  font-display: swap;
+  src: url("https://academiq-five.vercel.app/_next/static/media/5c285b27cdda1fe8-s.p.0yo6-5yoeeudq.woff2")
+    format("woff2");
+}
+
+@font-face {
+  font-family: "DM Serif Display";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("https://academiq-five.vercel.app/_next/static/media/0c8f209abc35ee02-s.p.03rqv30url-~q.woff2")
+    format("woff2");
+}
+
+:root {
+  --lms-brand-subtle: #fdf4fe;
+  --lms-brand-muted: #f8e6f9;
+  --lms-brand-border: #f0ccf3;
+  --lms-brand-default: #6b0472;
+  --lms-brand-hover: #520358;
+  --lms-bg-primary: #f8fafc;
+  --lms-bg-surface: #ffffff;
+  --lms-bg-sunken: #f1f5f9;
+  --lms-bg-border: #e2e8f0;
+  --lms-text-primary: #0f172a;
+  --lms-text-secondary: #475569;
+  --lms-text-muted: #94a3b8;
+  --lms-success: #16a34a;
+  --lms-warning: #d97706;
+  --lms-danger: #dc2626;
+  --lms-info: #0284c7;
+
+  --font-heading: "SUSE", "DM Sans", system-ui, sans-serif;
+  --font-body: "SUSE", "DM Sans", system-ui, sans-serif;
+  --font-telemetry: "SUSE Mono", "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --space: 0.25rem;
+
+  --bg-primary: #f8fafc;
+  --bg-elevated: #ffffff;
+  --bg-surface: #ffffff;
+  --bg-sunken: #f1f5f9;
+  --bg-panel: rgba(255, 255, 255, 0.96);
+  --bg-panel-solid: #ffffff;
+  --border-subtle: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --grid-line: rgba(107, 4, 114, 0.12);
+  --text-primary: #020617;
+  --text-secondary: #334155;
+  --text-muted: #94a3b8;
+  --text-inverse: #ffffff;
+  --accent-brand: #6b0472;
+  --accent-live: #0284c7;
+  --accent-live-muted: rgba(2, 132, 199, 0.1);
+  --accent-amber: #d97706;
+  --accent-cyan: #0891b2;
+  --danger: #dc2626;
+  --success: #16a34a;
+  --warning: #d97706;
+  --shadow-panel: 0 1px 3px rgba(15, 23, 42, 0.08), 0 20px 50px rgba(15, 23, 42, 0.06);
+  --shadow-control: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --focus-ring: 0 0 0 3px rgba(107, 4, 114, 0.16);
+}
+
+:root[data-theme="dark"] {
+  --bg-primary: #050505;
+  --bg-elevated: #0d0d0d;
+  --bg-surface: #111111;
+  --bg-sunken: #080808;
+  --bg-panel: rgba(17, 17, 17, 0.96);
+  --bg-panel-solid: #111111;
+  --border-subtle: #262626;
+  --border-strong: #404040;
+  --grid-line: rgba(255, 255, 255, 0.12);
+  --text-primary: #fafafa;
+  --text-secondary: #d4d4d4;
+  --text-muted: #737373;
+  --text-inverse: #050505;
+  --accent-brand: #fafafa;
+  --accent-live: #fafafa;
+  --accent-live-muted: rgba(255, 255, 255, 0.1);
+  --accent-amber: #d4d4d4;
+  --accent-cyan: #e5e5e5;
+  --danger: #f87171;
+  --success: #e5e5e5;
+  --warning: #a3a3a3;
+  --shadow-panel: 0 18px 46px rgba(0, 0, 0, 0.35);
+  --shadow-control: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --focus-ring: 0 0 0 3px rgba(255, 255, 255, 0.18);
+}
