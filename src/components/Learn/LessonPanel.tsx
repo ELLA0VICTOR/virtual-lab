@@ -44,6 +44,15 @@ const runLessonScenario = (scenario: LessonScenario): void => {
     store.setSetpoint("pitch", degreesToRadians(-10))
   }
 
+  if (scenario === "mission") {
+    store.resetMission()
+    store.loadPreset(presetId("untuned"))
+    store.setSetpoint("altitude", 0.85)
+    store.setSetpoint("roll", 0)
+    store.setSetpoint("pitch", 0)
+    store.setSetpoint("yaw", 0)
+  }
+
   store.setRunning(true)
 }
 
@@ -132,6 +141,21 @@ export function LessonPanel() {
               <div className="panel" style={{ marginTop: 4 }}>
                 <h3 className="panel-title">{activeLesson.title}</h3>
                 <p className="lesson-copy">{activeLesson.body}</p>
+                <div className="lesson-experiment-grid">
+                  <div>
+                    <strong>Do</strong>
+                    {activeLesson.experiment.map((item) => (
+                      <span key={item}>{item}</span>
+                    ))}
+                  </div>
+                  <div>
+                    <strong>Watch</strong>
+                    {activeLesson.observe.map((item) => (
+                      <span key={item}>{item}</span>
+                    ))}
+                  </div>
+                </div>
+                <div className="hint-box">{activeLesson.tryNext}</div>
                 <Button variant="primary" onClick={() => runLessonScenario(activeLesson.id)} style={{ marginTop: 12 }}>
                   {activeLesson.actionLabel}
                 </Button>

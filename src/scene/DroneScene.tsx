@@ -1,4 +1,4 @@
-import { Suspense, useState } from "react"
+import { Suspense, useRef, useState } from "react"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import { OrbitControls } from "@react-three/drei"
 import * as THREE from "three"
@@ -15,21 +15,32 @@ type CameraMode = "follow" | "top" | "side" | "free"
 
 function CameraController({ mode }: { mode: CameraMode }) {
   const { camera } = useThree()
+  const smoothedTargetRef = useRef(new THREE.Vector3())
+  const previousModeRef = useRef<CameraMode | null>(null)
 
   useFrame(() => {
     if (mode === "free") return
 
     const { quadrotor } = useSimulationStore.getState()
     const target = new THREE.Vector3(quadrotor.position[0], quadrotor.position[2], quadrotor.position[1])
+    const smoothedTarget = smoothedTargetRef.current
+
+    if (previousModeRef.current !== mode) {
+      smoothedTarget.copy(target)
+      previousModeRef.current = mode
+    } else {
+      smoothedTarget.lerp(target, mode === "top" ? 0.018 : 0.055)
+    }
+
     const desired =
       mode === "top"
-        ? target.clone().add(new THREE.Vector3(0.01, 6.8, 0.01))
+        ? new THREE.Vector3(smoothedTarget.x + 0.01, Math.max(6.8, smoothedTarget.y + 6.4), smoothedTarget.z + 0.01)
         : mode === "side"
-          ? target.clone().add(new THREE.Vector3(4.4, 1.35, 0.08))
-          : target.clone().add(new THREE.Vector3(3.2, 1.65, 3.8))
+          ? smoothedTarget.clone().add(new THREE.Vector3(4.4, 1.35, 0.08))
+          : smoothedTarget.clone().add(new THREE.Vector3(3.2, 1.65, 3.8))
 
-    camera.position.lerp(desired, 0.055)
-    camera.lookAt(target)
+    camera.position.lerp(desired, mode === "top" ? 0.035 : 0.055)
+    camera.lookAt(smoothedTarget)
   })
 
   return null

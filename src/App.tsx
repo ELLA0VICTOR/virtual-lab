@@ -28,6 +28,7 @@ function App() {
         <div className="workspace-grid">
           <DroneScene />
           <aside className="control-column boot-reveal" style={{ animationDelay: "150ms" }}>
+            <PilotControls />
             <div className="dock-tabs">
               {(["flight", "tune", "test"] as const).map((tab) => (
                 <button
@@ -43,7 +44,6 @@ function App() {
             {controlTab === "flight" ? (
               <>
                 <SimToolbar />
-                <PilotControls />
                 <MissionPanel />
                 <PresetSelector />
               </>
