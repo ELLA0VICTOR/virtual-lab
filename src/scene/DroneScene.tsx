@@ -6,6 +6,7 @@ import { formatRadiansAsDegrees } from "../physics/vector"
 import { useSimulationStore } from "../simulation/simulationStore"
 import { Button } from "../components/ui/Button"
 import { Environment } from "./Environment"
+import { MissionObjects } from "./MissionObjects"
 import { Quadrotor } from "./Quadrotor"
 import { SetpointMarker } from "./SetpointMarker"
 import { TrajectoryTrail } from "./TrajectoryTrail"
@@ -22,10 +23,10 @@ function CameraController({ mode }: { mode: CameraMode }) {
     const target = new THREE.Vector3(quadrotor.position[0], quadrotor.position[2], quadrotor.position[1])
     const desired =
       mode === "top"
-        ? target.clone().add(new THREE.Vector3(0.01, 3.8, 0.01))
+        ? target.clone().add(new THREE.Vector3(0.01, 6.8, 0.01))
         : mode === "side"
-          ? target.clone().add(new THREE.Vector3(2.8, 0.95, 0.08))
-          : target.clone().add(new THREE.Vector3(2.25, 1.22, 2.65))
+          ? target.clone().add(new THREE.Vector3(4.4, 1.35, 0.08))
+          : target.clone().add(new THREE.Vector3(3.2, 1.65, 3.8))
 
     camera.position.lerp(desired, 0.055)
     camera.lookAt(target)
@@ -35,7 +36,7 @@ function CameraController({ mode }: { mode: CameraMode }) {
 }
 
 export function DroneScene() {
-  const [cameraMode, setCameraMode] = useState<CameraMode>("free")
+  const [cameraMode, setCameraMode] = useState<CameraMode>("follow")
   const altitude = useSimulationStore((state) => state.quadrotor.position[2])
   const velocity = useSimulationStore((state) => state.quadrotor.velocity[2])
   const roll = useSimulationStore((state) => state.quadrotor.euler[0])
@@ -44,11 +45,12 @@ export function DroneScene() {
 
   return (
     <section className="scene-panel boot-reveal" style={{ animationDelay: "90ms" }}>
-      <Canvas shadows camera={{ position: [2.05, 1.18, 2.65], fov: 42, near: 0.02, far: 80 }} dpr={[1, 1.7]}>
+      <Canvas shadows camera={{ position: [3.2, 1.65, 3.8], fov: 42, near: 0.02, far: 120 }} dpr={[1, 1.7]}>
         <color attach="background" args={["#f8fafc"]} />
-        <fog attach="fog" args={["#f8fafc", 8, 22]} />
+        <fog attach="fog" args={["#f8fafc", 14, 48]} />
         <Suspense fallback={null}>
           <Environment />
+          <MissionObjects />
           <SetpointMarker />
           <TrajectoryTrail />
           <Quadrotor />
@@ -56,9 +58,10 @@ export function DroneScene() {
         <CameraController mode={cameraMode} />
         <OrbitControls
           enableDamping
+          enabled={cameraMode === "free"}
           dampingFactor={0.08}
           minDistance={0.55}
-          maxDistance={7}
+          maxDistance={16}
           target={[0, 0.45, 0]}
           onStart={() => setCameraMode("free")}
         />

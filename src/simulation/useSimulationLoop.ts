@@ -15,9 +15,11 @@ export const useSimulationLoop = (): void => {
       const deltaSeconds = Math.min(0.08, (time - previous) / 1000)
       previousTimeRef.current = time
 
-      const { running, speed, advanceSimulation } = useSimulationStore.getState()
+      const { running, speed, advanceSimulation, applyPilotCommand } = useSimulationStore.getState()
       if (running) {
-        accumulatorRef.current += deltaSeconds * speed
+        const scaledDelta = deltaSeconds * speed
+        applyPilotCommand(scaledDelta)
+        accumulatorRef.current += scaledDelta
         const steps = Math.min(MAX_STEPS_PER_FRAME, Math.floor(accumulatorRef.current / PHYSICS_DT))
         if (steps > 0) {
           accumulatorRef.current -= steps * PHYSICS_DT

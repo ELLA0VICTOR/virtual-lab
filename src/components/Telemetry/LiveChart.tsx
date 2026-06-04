@@ -75,9 +75,9 @@ const makeData = (mode: ChartMode, history: ReturnType<typeof useSimulationStore
 }
 
 const titleFor = (mode: ChartMode): string => {
-  if (mode === "altitude") return "Altitude Step Response"
-  if (mode === "attitude") return "Attitude vs Setpoint"
-  return "Control Error Signals"
+  if (mode === "altitude") return "Altitude Tracking"
+  if (mode === "attitude") return "Attitude Tracking"
+  return "Tracking Error Signals"
 }
 
 export function LiveChart({ mode }: LiveChartProps) {

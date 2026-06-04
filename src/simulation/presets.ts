@@ -9,6 +9,17 @@ export interface GainPreset {
 
 export const gainPresets: GainPreset[] = [
   {
+    id: "untuned",
+    name: "Untuned Start",
+    description: "Recoverable but rough: visible lag, wobble, and payload difficulty.",
+    gains: {
+      altitude: { kp: 3.25, ki: 0.18, kd: 0.72 },
+      roll: { kp: 3.6, ki: 0.04, kd: 0.42 },
+      pitch: { kp: 3.6, ki: 0.04, kd: 0.42 },
+      yaw: { kp: 1.25, ki: 0.03, kd: 0.2 },
+    },
+  },
+  {
     id: "well-tuned",
     name: "Well Tuned",
     description: "Fast altitude capture with damping and low steady-state error.",

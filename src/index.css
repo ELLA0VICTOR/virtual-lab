@@ -611,6 +611,198 @@ input:disabled {
   gap: 8px;
 }
 
+.pilot-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.stick-card {
+  min-width: 0;
+  padding: 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.stick-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.stick-pad {
+  position: relative;
+  display: grid;
+  aspect-ratio: 1;
+  min-height: 112px;
+  overflow: hidden;
+  place-items: center;
+  touch-action: none;
+  background:
+    linear-gradient(90deg, transparent calc(50% - 0.5px), var(--border-subtle) 50%, transparent calc(50% + 0.5px)),
+    linear-gradient(0deg, transparent calc(50% - 0.5px), var(--border-subtle) 50%, transparent calc(50% + 0.5px)),
+    radial-gradient(circle, transparent 0 47%, var(--border-subtle) calc(47% + 1px), transparent calc(47% + 2px)),
+    var(--bg-sunken);
+  border: 1px solid var(--border-subtle);
+  border-radius: 50%;
+}
+
+.stick-pad:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.stick-axis {
+  position: absolute;
+  color: var(--text-muted);
+  font-family: var(--font-telemetry);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.stick-axis-y {
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.stick-axis-x {
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+}
+
+.stick-knob {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 26px;
+  height: 26px;
+  background: var(--accent-brand);
+  border: 3px solid var(--bg-panel-solid);
+  border-radius: 50%;
+  box-shadow: 0 8px 18px rgba(107, 4, 114, 0.25);
+  pointer-events: none;
+}
+
+.pilot-readouts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.pilot-readouts > div {
+  min-width: 0;
+  padding: 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.pilot-readouts span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.pilot-readouts strong {
+  display: block;
+  margin-top: 3px;
+  overflow: hidden;
+  color: var(--text-primary);
+  font-family: var(--font-telemetry);
+  font-size: 0.78rem;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pilot-guide {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.pilot-guide > div {
+  min-width: 0;
+  padding: 8px;
+  background: var(--bg-sunken);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.pilot-guide span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.pilot-guide strong {
+  display: block;
+  margin-top: 3px;
+  overflow: hidden;
+  color: var(--text-primary);
+  font-size: 0.72rem;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mission-map {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.mission-map > div {
+  min-width: 0;
+  padding: 9px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.mission-map span {
+  display: block;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 0.64rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.mission-map strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-primary);
+  font-family: var(--font-telemetry);
+  font-size: 0.86rem;
+  line-height: 1;
+}
+
+.mission-hint {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
 .metric-card {
   min-width: 0;
   padding: 10px;
@@ -706,13 +898,6 @@ input:disabled {
   width: min(100%, 210px);
   height: auto;
   filter: drop-shadow(0 16px 28px rgba(0, 0, 0, 0.28));
-}
-
-.learn-toggle {
-  position: fixed;
-  right: 16px;
-  bottom: 16px;
-  z-index: 50;
 }
 
 .learn-panel {
@@ -861,6 +1046,11 @@ input:disabled {
   .number-grid,
   .metrics-grid {
     grid-template-columns: 1fr;
+  }
+
+  .pilot-grid,
+  .pilot-readouts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .scene-overlay {

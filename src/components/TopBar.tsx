@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { FiMoon, FiSun } from "react-icons/fi"
+import { FiBookOpen, FiMoon, FiSun } from "react-icons/fi"
 import { useSimulationStore } from "../simulation/simulationStore"
 import { Badge } from "./ui/Badge"
 import { Button } from "./ui/Button"
@@ -50,6 +50,7 @@ export function TopBar() {
   const running = useSimulationStore((state) => state.running)
   const speed = useSimulationStore((state) => state.speed)
   const elapsed = useSimulationStore((state) => state.elapsed)
+  const setLearnOpen = useSimulationStore((state) => state.setLearnOpen)
   const [theme, setTheme] = useState<"light" | "dark">("light")
 
   useEffect(() => {
@@ -70,6 +71,9 @@ export function TopBar() {
         <Badge tone={running ? "live" : "warn"}>{running ? "Running" : "Paused"}</Badge>
         <Badge>{speed.toFixed(speed < 1 ? 2 : 0)}x</Badge>
         <Badge>{elapsed.toFixed(1)} s</Badge>
+        <Button icon={FiBookOpen} onClick={() => setLearnOpen(true)}>
+          Learn
+        </Button>
         <Button
           icon={theme === "light" ? FiMoon : FiSun}
           iconOnly

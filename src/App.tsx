@@ -1,6 +1,8 @@
 import { useState } from "react"
 import { DisturbancePanel } from "./components/ControlPanel/DisturbancePanel"
 import { GainSliders } from "./components/ControlPanel/GainSliders"
+import { MissionPanel } from "./components/ControlPanel/MissionPanel"
+import { PilotControls } from "./components/ControlPanel/PilotControls"
 import { PresetSelector } from "./components/ControlPanel/PresetSelector"
 import { SetpointControls } from "./components/ControlPanel/SetpointControls"
 import { SimToolbar } from "./components/ControlPanel/SimToolbar"
@@ -41,13 +43,15 @@ function App() {
             {controlTab === "flight" ? (
               <>
                 <SimToolbar />
-                <SetpointControls />
+                <PilotControls />
+                <MissionPanel />
                 <PresetSelector />
               </>
             ) : null}
             {controlTab === "tune" ? (
               <>
                 <GainSliders />
+                <SetpointControls />
                 <MetricsCard />
               </>
             ) : null}

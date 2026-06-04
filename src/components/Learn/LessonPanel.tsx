@@ -100,9 +100,6 @@ export function LessonPanel() {
 
   return (
     <>
-      <Button className="learn-toggle" onClick={() => setLearnOpen(true)}>
-        Learn
-      </Button>
       <aside className={`learn-panel ${open ? "open" : ""}`.trim()} aria-hidden={!open}>
         <div className="panel-header">
           <div>

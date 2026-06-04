@@ -2,6 +2,7 @@ import { useMemo, useRef } from "react"
 import { useFrame } from "@react-three/fiber"
 import * as THREE from "three"
 import { ARM_LENGTH } from "../physics/constants"
+import { rotationMatrixFromEuler } from "../physics/vector"
 import { useSimulationStore } from "../simulation/simulationStore"
 
 const VISUAL_ARM = ARM_LENGTH * 1.72
@@ -9,10 +10,10 @@ const VISUAL_SCALE = 1.58
 const IDLE_RECORDING_OMEGA = 760
 
 const motorPositions = [
-  { label: "front", position: new THREE.Vector3(0, 0, VISUAL_ARM), led: "#16a34a", spin: 1 },
-  { label: "right", position: new THREE.Vector3(VISUAL_ARM, 0, 0), led: "#dc2626", spin: -1 },
-  { label: "rear", position: new THREE.Vector3(0, 0, -VISUAL_ARM), led: "#dc2626", spin: 1 },
-  { label: "left", position: new THREE.Vector3(-VISUAL_ARM, 0, 0), led: "#16a34a", spin: -1 },
+  { label: "front", position: new THREE.Vector3(VISUAL_ARM, 0, 0), led: "#16a34a", spin: 1 },
+  { label: "right", position: new THREE.Vector3(0, 0, VISUAL_ARM), led: "#dc2626", spin: -1 },
+  { label: "rear", position: new THREE.Vector3(-VISUAL_ARM, 0, 0), led: "#dc2626", spin: 1 },
+  { label: "left", position: new THREE.Vector3(0, 0, -VISUAL_ARM), led: "#16a34a", spin: -1 },
 ]
 
 const cagePosts = Array.from({ length: 8 }, (_, index) => {
@@ -23,6 +24,7 @@ const cagePosts = Array.from({ length: 8 }, (_, index) => {
 export function Quadrotor() {
   const groupRef = useRef<THREE.Group>(null)
   const propRefs = useRef<Array<THREE.Group | null>>([])
+  const sceneRotationRef = useRef(new THREE.Matrix4())
   const bodyMaterial = useMemo(
     () => new THREE.MeshStandardMaterial({ color: "#f1f5f9", roughness: 0.42, metalness: 0.18 }),
     [],
@@ -62,6 +64,20 @@ export function Quadrotor() {
       }),
     [],
   )
+  const noseMaterial = useMemo(
+    () => new THREE.MeshStandardMaterial({ color: "#0284c7", emissive: "#0284c7", emissiveIntensity: 0.18, roughness: 0.34 }),
+    [],
+  )
+  const headingMaterial = useMemo(
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: "#0284c7",
+        transparent: true,
+        opacity: 0.28,
+        depthWrite: false,
+      }),
+    [],
+  )
 
   useFrame((_, delta) => {
     const { quadrotor, motorOutput } = useSimulationStore.getState()
@@ -69,7 +85,26 @@ export function Quadrotor() {
     if (!group) return
 
     group.position.set(quadrotor.position[0], quadrotor.position[2] + 0.08, quadrotor.position[1])
-    group.rotation.set(quadrotor.euler[1], quadrotor.euler[2], -quadrotor.euler[0], "YXZ")
+    const rotation = rotationMatrixFromEuler(quadrotor.euler)
+    sceneRotationRef.current.set(
+      rotation[0][0],
+      rotation[0][2],
+      rotation[0][1],
+      0,
+      rotation[2][0],
+      rotation[2][2],
+      rotation[2][1],
+      0,
+      rotation[1][0],
+      rotation[1][2],
+      rotation[1][1],
+      0,
+      0,
+      0,
+      0,
+      1,
+    )
+    group.setRotationFromMatrix(sceneRotationRef.current)
 
     propRefs.current.forEach((prop, index) => {
       if (prop) {
@@ -117,6 +152,14 @@ export function Quadrotor() {
       <mesh castShadow receiveShadow material={bodyMaterial} position={[0, 0.23, 0]}>
         <boxGeometry args={[0.12, 0.055, 0.1]} />
       </mesh>
+      <group position={[VISUAL_ARM * 1.78, 0.08, 0]}>
+        <mesh castShadow material={noseMaterial} rotation={[0, 0, -Math.PI / 2]}>
+          <coneGeometry args={[0.06, 0.16, 3]} />
+        </mesh>
+        <mesh material={headingMaterial} position={[0.2, -0.12, 0]} rotation={[0, 0, -Math.PI / 2]}>
+          <coneGeometry args={[0.055, 0.34, 3]} />
+        </mesh>
+      </group>
 
       {motorPositions.map((motor, index) => (
         <group key={motor.label} position={motor.position}>

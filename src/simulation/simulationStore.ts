@@ -4,7 +4,7 @@ import { integrateRK4 } from "../physics/integrator"
 import { mixPlusConfiguration, motorOutputToControl } from "../physics/motorMixer"
 import { PIDController } from "../physics/pidController"
 import { computeResponseMetrics, EMPTY_METRICS } from "../physics/metrics"
-import { clamp, wrapAngle } from "../physics/vector"
+import { clamp, degreesToRadians, wrapAngle } from "../physics/vector"
 import { createIdleDisturbance, createWindGust, motorFaultFactors, payloadMassForMode } from "./disturbances"
 import { defaultPreset, gainPresets } from "./presets"
 import type {
@@ -31,6 +31,32 @@ interface ControllerBank {
   yaw: PIDController
 }
 
+export type MissionStatus = "ready" | "carrying" | "delivered" | "dropped"
+export type PilotSource = "idle" | "virtual" | "keyboard" | "gamepad"
+
+export interface PilotInput {
+  enabled: boolean
+  source: PilotSource
+  leftX: number
+  leftY: number
+  rightX: number
+  rightY: number
+  gamepadName: string | null
+}
+
+type PilotInputUpdate = Partial<Omit<PilotInput, "enabled">>
+
+export interface MissionState {
+  status: MissionStatus
+  packagePosition: Vec3
+  dropZonePosition: Vec3
+  packageMass: number
+  pickupAvailable: boolean
+  dropAvailable: boolean
+  lastDropError: number | null
+  message: string
+}
+
 export interface SimulationStore {
   quadrotor: QuadrotorState
   elapsed: number
@@ -44,6 +70,8 @@ export interface SimulationStore {
   disturbances: ReturnType<typeof createIdleDisturbance>
   payloadEnabled: boolean
   motorFaultIndex: number | null
+  mission: MissionState
+  pilotInput: PilotInput
   activePresetId: string
   stepStartedAt: number
   lastHistoryAt: number
@@ -64,6 +92,13 @@ export interface SimulationStore {
   togglePayload: () => void
   setMotorFault: (motorIndex: number | null) => void
   resetDisturbances: () => void
+  pickupPackage: () => void
+  dropPackage: () => void
+  resetMission: () => void
+  setPilotEnabled: (enabled: boolean) => void
+  setPilotInput: (input: PilotInputUpdate) => void
+  centerPilotInput: () => void
+  applyPilotCommand: (deltaSeconds: number) => void
   setLearnOpen: (open: boolean) => void
   setActiveLesson: (lessonId: string) => void
   setActiveChallenge: (challengeId: string) => void
@@ -130,10 +165,75 @@ const resetControllers = (controllers: ControllerBank): void => {
 }
 
 const initialSetpoints: Setpoints = {
-  altitude: 1.8,
+  altitude: 1.35,
   roll: 0,
   pitch: 0,
   yaw: 0,
+}
+
+const createMissionState = (): MissionState => ({
+  status: "ready",
+  packagePosition: [2.8, -2.1, 0.14],
+  dropZonePosition: [-2.8, 2.35, 0],
+  packageMass: 0.36,
+  pickupAvailable: false,
+  dropAvailable: false,
+  lastDropError: null,
+  message: "Fly near the package and hold a steady low hover to pick it up.",
+})
+
+const createPilotInput = (): PilotInput => ({
+  enabled: false,
+  source: "idle",
+  leftX: 0,
+  leftY: 0,
+  rightX: 0,
+  rightY: 0,
+  gamepadName: null,
+})
+
+const horizontalDistance = (a: Vec3, b: Vec3): number => Math.hypot(a[0] - b[0], a[1] - b[1])
+
+const isStableForCargo = (quadrotor: QuadrotorState): boolean => {
+  const horizontalSpeed = Math.hypot(quadrotor.velocity[0], quadrotor.velocity[1])
+  return (
+    horizontalSpeed < 0.72 &&
+    Math.abs(quadrotor.velocity[2]) < 0.42 &&
+    Math.abs(quadrotor.euler[0]) < 0.22 &&
+    Math.abs(quadrotor.euler[1]) < 0.22
+  )
+}
+
+const evaluateMission = (mission: MissionState, quadrotor: QuadrotorState): MissionState => {
+  if (mission.status === "delivered" || mission.status === "dropped") {
+    return {
+      ...mission,
+      pickupAvailable: false,
+      dropAvailable: false,
+    }
+  }
+
+  const altitude = quadrotor.position[2]
+  const stable = isStableForCargo(quadrotor)
+  const pickupDistance = horizontalDistance(quadrotor.position, mission.packagePosition)
+  const dropDistance = horizontalDistance(quadrotor.position, mission.dropZonePosition)
+  const pickupAvailable = mission.status === "ready" && pickupDistance < 0.72 && altitude > 0.22 && altitude < 1.05 && stable
+  const dropAvailable = mission.status === "carrying" && dropDistance < 0.85 && altitude > 0.28 && altitude < 1.25 && stable
+  const message =
+    mission.status === "carrying"
+      ? dropAvailable
+        ? "Stable over the drop zone. Release the package."
+        : "Carry the package to the blue drop zone and settle before release."
+      : pickupAvailable
+        ? "Stable over the package. Pick it up."
+        : "Approach the package slowly and stabilize below 1.05 m."
+
+  return {
+    ...mission,
+    pickupAvailable,
+    dropAvailable,
+    message,
+  }
 }
 
 const makeHistorySample = (
@@ -163,6 +263,29 @@ const makeHistorySample = (
 const appendHistory = (history: HistorySample[], sample: HistorySample): HistorySample[] => {
   const next = [...history, sample]
   return next.length > HISTORY_LIMIT ? next.slice(next.length - HISTORY_LIMIT) : next
+}
+
+const PILOT_PROFILES: Record<PilotSource, { maxTilt: number; yawRate: number; altitudeRate: number }> = {
+  idle: {
+    maxTilt: 0,
+    yawRate: 0,
+    altitudeRate: 0,
+  },
+  keyboard: {
+    maxTilt: degreesToRadians(15),
+    yawRate: 0,
+    altitudeRate: 0,
+  },
+  virtual: {
+    maxTilt: degreesToRadians(18),
+    yawRate: degreesToRadians(70),
+    altitudeRate: 0.85,
+  },
+  gamepad: {
+    maxTilt: degreesToRadians(13),
+    yawRate: degreesToRadians(48),
+    altitudeRate: 0.62,
+  },
 }
 
 const computeMetrics = (
@@ -210,6 +333,8 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
   disturbances: createIdleDisturbance(),
   payloadEnabled: false,
   motorFaultIndex: null,
+  mission: evaluateMission(createMissionState(), INITIAL_STATE),
+  pilotInput: createPilotInput(),
   activePresetId: defaultPreset.id,
   stepStartedAt: 0,
   lastHistoryAt: 0,
@@ -273,6 +398,8 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
       disturbances: createIdleDisturbance(),
       payloadEnabled: false,
       motorFaultIndex: null,
+      mission: evaluateMission(createMissionState(), INITIAL_STATE),
+      pilotInput: createPilotInput(),
       stepStartedAt: 0,
       lastHistoryAt: 0,
     })
@@ -290,19 +417,22 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
       let history = state.history
       let lastHistoryAt = state.lastHistoryAt
       let disturbance = state.disturbances
+      let mission = state.mission
 
       for (let index = 0; index < steps; index += 1) {
         elapsed += PHYSICS_DT
         const windActive = disturbance.windEndsAt > elapsed
         const windForce: Vec3 = windActive ? disturbance.windForce : [0, 0, 0]
-        const requestedControl = calculateControl(quadrotor, state.setpoints, disturbance.payloadMass, controllers)
+        const missionPayloadMass = mission.status === "carrying" ? mission.packageMass : 0
+        const effectivePayloadMass = disturbance.payloadMass + missionPayloadMass
+        const requestedControl = calculateControl(quadrotor, state.setpoints, effectivePayloadMass, controllers)
         motorOutput = mixPlusConfiguration(requestedControl, disturbance.motorFactors)
         const actualControl = motorOutputToControl(motorOutput)
         quadrotor = integrateRK4(
           quadrotor,
           {
             control: actualControl,
-            payloadMass: disturbance.payloadMass,
+            payloadMass: effectivePayloadMass,
             windForce,
           },
           PHYSICS_DT,
@@ -313,6 +443,8 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
           lastHistoryAt = elapsed
         }
       }
+
+      mission = evaluateMission(mission, quadrotor)
 
       if (disturbance.windEndsAt <= elapsed && disturbance.windForce.some((component) => component !== 0)) {
         disturbance = {
@@ -329,6 +461,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
         history,
         lastHistoryAt,
         disturbances: disturbance,
+        mission,
         metrics: computeMetrics(history, state.stepStartedAt),
       }
     }),
@@ -370,6 +503,131 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
       motorFaultIndex: null,
       stepStartedAt: state.elapsed,
     })),
+
+  pickupPackage: () =>
+    set((state) => {
+      const mission = evaluateMission(state.mission, state.quadrotor)
+      if (!mission.pickupAvailable || mission.status !== "ready") {
+        return {
+          mission,
+        }
+      }
+
+      return {
+        mission: evaluateMission(
+          {
+            ...mission,
+            status: "carrying",
+            pickupAvailable: false,
+            message: "Payload attached. Tune altitude control and fly to the drop zone.",
+          },
+          state.quadrotor,
+        ),
+        stepStartedAt: state.elapsed,
+      }
+    }),
+
+  dropPackage: () =>
+    set((state) => {
+      const mission = evaluateMission(state.mission, state.quadrotor)
+      if (mission.status !== "carrying") {
+        return {
+          mission,
+        }
+      }
+
+      const dropError = horizontalDistance(state.quadrotor.position, mission.dropZonePosition)
+      const delivered = mission.dropAvailable
+      const packagePosition: Vec3 = delivered
+        ? [mission.dropZonePosition[0], mission.dropZonePosition[1], 0.14]
+        : [state.quadrotor.position[0], state.quadrotor.position[1], 0.14]
+
+      return {
+        mission: {
+          ...mission,
+          status: delivered ? "delivered" : "dropped",
+          packagePosition,
+          pickupAvailable: false,
+          dropAvailable: false,
+          lastDropError: dropError,
+          message: delivered
+            ? "Delivery complete. The controller held a stable hover at release."
+            : "Package released outside the stable drop window. Tune and reset the mission.",
+        },
+        stepStartedAt: state.elapsed,
+      }
+    }),
+
+  resetMission: () => set((state) => ({ mission: evaluateMission(createMissionState(), state.quadrotor) })),
+
+  setPilotEnabled: (enabled) =>
+    set((state) => ({
+      pilotInput: {
+        ...state.pilotInput,
+        enabled,
+        source: enabled ? state.pilotInput.source : "idle",
+        leftX: enabled ? state.pilotInput.leftX : 0,
+        leftY: enabled ? state.pilotInput.leftY : 0,
+        rightX: enabled ? state.pilotInput.rightX : 0,
+        rightY: enabled ? state.pilotInput.rightY : 0,
+      },
+    })),
+
+  setPilotInput: (input) =>
+    set((state) => ({
+      pilotInput: {
+        ...state.pilotInput,
+        ...input,
+        leftX: clamp(input.leftX ?? state.pilotInput.leftX, -1, 1),
+        leftY: clamp(input.leftY ?? state.pilotInput.leftY, -1, 1),
+        rightX: clamp(input.rightX ?? state.pilotInput.rightX, -1, 1),
+        rightY: clamp(input.rightY ?? state.pilotInput.rightY, -1, 1),
+      },
+    })),
+
+  centerPilotInput: () =>
+    set((state) => ({
+      pilotInput: {
+        ...state.pilotInput,
+        source: "idle",
+        leftX: 0,
+        leftY: 0,
+        rightX: 0,
+        rightY: 0,
+      },
+      setpoints: {
+        ...state.setpoints,
+        roll: 0,
+        pitch: 0,
+      },
+    })),
+
+  applyPilotCommand: (deltaSeconds) =>
+    set((state) => {
+      if (!state.pilotInput.enabled || deltaSeconds <= 0) return state
+
+      const { leftX, leftY, rightX, rightY, source } = state.pilotInput
+      const profile = PILOT_PROFILES[source]
+      const nextSetpoints: Setpoints = {
+        altitude: clamp(state.setpoints.altitude - leftY * profile.altitudeRate * deltaSeconds, 0.2, 5),
+        yaw: wrapAngle(state.setpoints.yaw + leftX * profile.yawRate * deltaSeconds),
+        roll: rightX * profile.maxTilt,
+        pitch: -rightY * profile.maxTilt,
+      }
+
+      if (
+        Math.abs(nextSetpoints.altitude - state.setpoints.altitude) < 0.0001 &&
+        Math.abs(nextSetpoints.yaw - state.setpoints.yaw) < 0.0001 &&
+        Math.abs(nextSetpoints.roll - state.setpoints.roll) < 0.0001 &&
+        Math.abs(nextSetpoints.pitch - state.setpoints.pitch) < 0.0001
+      ) {
+        return state
+      }
+
+      return {
+        setpoints: nextSetpoints,
+      }
+    }),
 
   setLearnOpen: (open) => set({ learnOpen: open }),
   setActiveLesson: (lessonId) => set({ activeLessonId: lessonId, activeLearnTab: "lessons", learnOpen: true }),
