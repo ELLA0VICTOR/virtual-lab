@@ -15,7 +15,7 @@ export function GainSliders() {
   const setGain = useSimulationStore((state) => state.setGain)
 
   return (
-    <Panel title="PID Gain Matrix" subtitle="Tune Kp, Ki, Kd and watch saturation, response, and stability change.">
+    <Panel data-guide="tune" title="PID Gain Matrix" subtitle="Tune Kp, Ki, Kd and watch saturation, response, and stability change.">
       <div className="gain-grid">
         {axes.map((axis) => (
           <div className="axis-card" key={axis.id}>

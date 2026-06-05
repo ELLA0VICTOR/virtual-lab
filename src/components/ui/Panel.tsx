@@ -1,16 +1,15 @@
-import type { ReactNode } from "react"
+import type { HTMLAttributes, ReactNode } from "react"
 
-interface PanelProps {
+interface PanelProps extends HTMLAttributes<HTMLElement> {
   title: string
   subtitle?: string
   action?: ReactNode
-  className?: string
   children: ReactNode
 }
 
-export function Panel({ title, subtitle, action, className = "", children }: PanelProps) {
+export function Panel({ title, subtitle, action, className = "", children, ...props }: PanelProps) {
   return (
-    <section className={`panel ${className}`.trim()}>
+    <section className={`panel ${className}`.trim()} {...props}>
       <div className="panel-header">
         <div>
           <h2 className="panel-title">{title}</h2>

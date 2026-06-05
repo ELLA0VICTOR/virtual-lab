@@ -26,7 +26,11 @@ export function MissionPanel() {
   const canDrop = mission.status === "carrying" && mission.dropAvailable
 
   return (
-    <Panel title="Payload Mission" action={<Badge tone={mission.status === "delivered" ? "live" : "warn"}>{statusLabel[mission.status]}</Badge>}>
+    <Panel
+      data-guide="mission"
+      title="Payload Mission"
+      action={<Badge tone={mission.status === "delivered" ? "live" : "warn"}>{statusLabel[mission.status]}</Badge>}
+    >
       <div className="mission-map">
         <div>
           <span>Package</span>

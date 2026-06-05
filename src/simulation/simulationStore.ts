@@ -79,6 +79,9 @@ export interface SimulationStore {
   activeLessonId: string
   activeChallengeId: string
   activeLearnTab: "lessons" | "challenges"
+  activeGuideId: string | null
+  activeGuideStep: number
+  completedGuideIds: string[]
   setRunning: (running: boolean) => void
   toggleRunning: () => void
   setSpeed: (speed: number) => void
@@ -103,6 +106,10 @@ export interface SimulationStore {
   setActiveLesson: (lessonId: string) => void
   setActiveChallenge: (challengeId: string) => void
   setActiveLearnTab: (tab: "lessons" | "challenges") => void
+  startGuidedLesson: (guideId: string) => void
+  stopGuidedLesson: () => void
+  setActiveGuideStep: (step: number) => void
+  finishGuidedLesson: () => void
 }
 
 const cloneGains = (gains: GainSet): GainSet => ({
@@ -342,6 +349,9 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
   activeLessonId: "axes",
   activeChallengeId: "altitude-step",
   activeLearnTab: "lessons",
+  activeGuideId: null,
+  activeGuideStep: 0,
+  completedGuideIds: [],
 
   setRunning: (running) => set({ running }),
   toggleRunning: () => set((state) => ({ running: !state.running })),
@@ -634,4 +644,16 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
   setActiveChallenge: (challengeId) =>
     set({ activeChallengeId: challengeId, activeLearnTab: "challenges", learnOpen: true }),
   setActiveLearnTab: (tab) => set({ activeLearnTab: tab }),
+  startGuidedLesson: (guideId) => set({ activeGuideId: guideId, activeGuideStep: 0, learnOpen: false }),
+  stopGuidedLesson: () => set({ activeGuideId: null, activeGuideStep: 0 }),
+  setActiveGuideStep: (step) => set({ activeGuideStep: Math.max(0, step) }),
+  finishGuidedLesson: () =>
+    set((state) => ({
+      activeGuideId: null,
+      activeGuideStep: 0,
+      completedGuideIds:
+        state.activeGuideId && !state.completedGuideIds.includes(state.activeGuideId)
+          ? [...state.completedGuideIds, state.activeGuideId]
+          : state.completedGuideIds,
+    })),
 }))

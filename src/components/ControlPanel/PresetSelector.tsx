@@ -7,7 +7,7 @@ export function PresetSelector() {
   const loadPreset = useSimulationStore((state) => state.loadPreset)
 
   return (
-    <Panel title="Tuning Presets" subtitle="Load known controller personalities, then adjust by hand.">
+    <Panel data-guide="presets" title="Tuning Presets" subtitle="Load known controller personalities, then adjust by hand.">
       <div className="preset-list">
         {gainPresets.map((preset) => (
           <button

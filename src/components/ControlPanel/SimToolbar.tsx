@@ -17,6 +17,7 @@ export function SimToolbar() {
 
   return (
     <Panel
+      data-guide="run"
       title="Run Control"
       subtitle="Fixed-step RK4 physics at 500 Hz."
       action={<Badge tone={running ? "live" : "warn"}>{running ? "Running" : "Paused"}</Badge>}

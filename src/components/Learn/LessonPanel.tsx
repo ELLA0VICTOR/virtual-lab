@@ -1,6 +1,7 @@
-import { FiX } from "react-icons/fi"
+import { FiCheckCircle, FiPlayCircle, FiX } from "react-icons/fi"
 import { degreesToRadians, formatRadiansAsDegrees } from "../../physics/vector"
 import { challenges } from "../../data/challenges"
+import { guidedLessons } from "../../data/guidedLessons"
 import { lessons, type LessonScenario } from "../../data/lessons"
 import { gainPresets } from "../../simulation/presets"
 import { useSimulationStore } from "../../simulation/simulationStore"
@@ -85,12 +86,15 @@ export function LessonPanel() {
   const activeLessonId = useSimulationStore((state) => state.activeLessonId)
   const activeChallengeId = useSimulationStore((state) => state.activeChallengeId)
   const activeLearnTab = useSimulationStore((state) => state.activeLearnTab)
+  const activeGuideId = useSimulationStore((state) => state.activeGuideId)
+  const completedGuideIds = useSimulationStore((state) => state.completedGuideIds)
   const metrics = useSimulationStore((state) => state.metrics)
   const motorOutput = useSimulationStore((state) => state.motorOutput)
   const setLearnOpen = useSimulationStore((state) => state.setLearnOpen)
   const setActiveLesson = useSimulationStore((state) => state.setActiveLesson)
   const setActiveChallenge = useSimulationStore((state) => state.setActiveChallenge)
   const setActiveLearnTab = useSimulationStore((state) => state.setActiveLearnTab)
+  const startGuidedLesson = useSimulationStore((state) => state.startGuidedLesson)
 
   const activeLesson = lessons.find((lesson) => lesson.id === activeLessonId) ?? lessons[0]
   const attitudeSse =
@@ -112,8 +116,8 @@ export function LessonPanel() {
       <aside className={`learn-panel ${open ? "open" : ""}`.trim()} aria-hidden={!open}>
         <div className="panel-header">
           <div>
-            <h2 className="panel-title">Learning Console</h2>
-            <p className="panel-subtitle">PID cause and effect, tied to the running simulation.</p>
+            <h2 className="panel-title">Interactive Course</h2>
+            <p className="panel-subtitle">Guided control lessons tied to the running simulation.</p>
           </div>
           <Button icon={FiX} iconOnly onClick={() => setLearnOpen(false)}>
             Close
@@ -121,25 +125,69 @@ export function LessonPanel() {
         </div>
         <div className="learn-body">
           <div className="tabs">
-            <Tab value="lessons" activeValue={activeLearnTab} label="Lessons" onSelect={setActiveLearnTab} />
+            <Tab value="lessons" activeValue={activeLearnTab} label="Course" onSelect={setActiveLearnTab} />
             <Tab value="challenges" activeValue={activeLearnTab} label="Challenges" onSelect={setActiveLearnTab} />
           </div>
 
           {activeLearnTab === "lessons" ? (
-            <div className="lesson-list" style={{ marginTop: 12 }}>
-              {lessons.map((lesson) => (
-                <button
-                  className={`lesson-card ${lesson.id === activeLesson.id ? "active" : ""}`.trim()}
-                  key={lesson.id}
-                  type="button"
-                  onClick={() => setActiveLesson(lesson.id)}
-                >
-                  <strong>{lesson.title}</strong>
-                  <span>{lesson.summary}</span>
-                </button>
-              ))}
-              <div className="panel" style={{ marginTop: 4 }}>
-                <h3 className="panel-title">{activeLesson.title}</h3>
+            <div className="course-shell" style={{ marginTop: 12 }}>
+              <div className="course-intro">
+                <span>Guided lab mode</span>
+                <strong>Learn by flying, tuning, and proving stability.</strong>
+                <p>Each session sets up the simulator, pauses at the right moment, highlights the control to use, then checks the learning action.</p>
+              </div>
+
+              <div className="course-list">
+                {guidedLessons.map((guide) => {
+                  const completed = completedGuideIds.includes(guide.id)
+                  const active = activeGuideId === guide.id
+
+                  return (
+                    <button
+                      className={`course-card ${active ? "active" : ""} ${completed ? "complete" : ""}`.trim()}
+                      key={guide.id}
+                      type="button"
+                      onClick={() => startGuidedLesson(guide.id)}
+                    >
+                      <span className="course-stage">{guide.stage}</span>
+                      <span className="course-card-body">
+                        <strong>{guide.title}</strong>
+                        <span>{guide.summary}</span>
+                        <em>{guide.outcome}</em>
+                      </span>
+                      <span className="course-status">
+                        {completed ? <FiCheckCircle aria-hidden="true" size={15} /> : <FiPlayCircle aria-hidden="true" size={15} />}
+                        {completed ? "Done" : active ? "Running" : guide.duration}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+
+              <div className="panel reference-panel">
+                <div className="reference-head">
+                  <div>
+                    <h3 className="panel-title">Quick Reference</h3>
+                    <p className="lesson-copy">Use this when you want the short theory note without launching a guided session.</p>
+                  </div>
+                </div>
+
+                <div className="lesson-chip-list">
+                  {lessons.map((lesson) => (
+                    <button
+                      className={`lesson-chip ${lesson.id === activeLesson.id ? "active" : ""}`.trim()}
+                      key={lesson.id}
+                      type="button"
+                      onClick={() => setActiveLesson(lesson.id)}
+                    >
+                      {lesson.title}
+                    </button>
+                  ))}
+                </div>
+
+                <h3 className="panel-title" style={{ marginTop: 14 }}>
+                  {activeLesson.title}
+                </h3>
                 <p className="lesson-copy">{activeLesson.body}</p>
                 <div className="lesson-experiment-grid">
                   <div>

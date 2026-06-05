@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react"
-import { FiBookOpen, FiMoon, FiSun } from "react-icons/fi"
+import { FiBookOpen } from "react-icons/fi"
 import { useSimulationStore } from "../simulation/simulationStore"
 import { Badge } from "./ui/Badge"
 import { Button } from "./ui/Button"
@@ -51,11 +50,6 @@ export function TopBar() {
   const speed = useSimulationStore((state) => state.speed)
   const elapsed = useSimulationStore((state) => state.elapsed)
   const setLearnOpen = useSimulationStore((state) => state.setLearnOpen)
-  const [theme, setTheme] = useState<"light" | "dark">("light")
-
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme
-  }, [theme])
 
   return (
     <header className="top-bar boot-reveal" style={{ animationDelay: "0ms" }}>
@@ -73,13 +67,6 @@ export function TopBar() {
         <Badge>{elapsed.toFixed(1)} s</Badge>
         <Button icon={FiBookOpen} onClick={() => setLearnOpen(true)}>
           Learn
-        </Button>
-        <Button
-          icon={theme === "light" ? FiMoon : FiSun}
-          iconOnly
-          onClick={() => setTheme((value) => (value === "light" ? "dark" : "light"))}
-        >
-          Toggle theme
         </Button>
       </div>
     </header>

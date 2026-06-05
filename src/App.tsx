@@ -7,6 +7,7 @@ import { PresetSelector } from "./components/ControlPanel/PresetSelector"
 import { SetpointControls } from "./components/ControlPanel/SetpointControls"
 import { SimToolbar } from "./components/ControlPanel/SimToolbar"
 import { LessonPanel } from "./components/Learn/LessonPanel"
+import { TutorOverlay } from "./components/Learn/TutorOverlay"
 import { AttitudeIndicator } from "./components/Telemetry/AttitudeIndicator"
 import { LiveChart } from "./components/Telemetry/LiveChart"
 import { MetricsCard } from "./components/Telemetry/MetricsCard"
@@ -29,7 +30,7 @@ function App() {
           <DroneScene />
           <aside className="control-column boot-reveal" style={{ animationDelay: "150ms" }}>
             <PilotControls />
-            <div className="dock-tabs">
+            <div className="dock-tabs" data-guide="tabs">
               {(["flight", "tune", "test"] as const).map((tab) => (
                 <button
                   className={`dock-tab ${controlTab === tab ? "active" : ""}`.trim()}
@@ -64,13 +65,14 @@ function App() {
             ) : null}
           </aside>
         </div>
-        <section className="bottom-grid charts-only boot-reveal" style={{ animationDelay: "220ms" }}>
+        <section className="bottom-grid charts-only boot-reveal" data-guide="charts" style={{ animationDelay: "220ms" }}>
           <LiveChart mode="altitude" />
           <LiveChart mode="attitude" />
           <LiveChart mode="error" />
         </section>
       </div>
       <LessonPanel />
+      <TutorOverlay />
     </main>
   )
 }

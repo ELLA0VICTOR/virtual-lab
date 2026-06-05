@@ -131,7 +131,7 @@ export function LiveChart({ mode }: LiveChartProps) {
   }, [data])
 
   return (
-    <Panel title={titleFor(mode)} className="chart-panel">
+    <Panel title={titleFor(mode)} className="chart-panel" data-guide="charts">
       <div className="chart-host" ref={hostRef} />
     </Panel>
   )

@@ -29,7 +29,7 @@ export function Quadrotor() {
     () => new THREE.MeshStandardMaterial({ color: "#f1f5f9", roughness: 0.42, metalness: 0.18 }),
     [],
   )
-  const darkMaterial = useMemo(
+  const graphiteMaterial = useMemo(
     () => new THREE.MeshStandardMaterial({ color: "#1f2937", roughness: 0.5, metalness: 0.46 }),
     [],
   )
@@ -146,7 +146,7 @@ export function Quadrotor() {
       <mesh castShadow receiveShadow material={bodyMaterial} position={[0, 0.045, 0]}>
         <boxGeometry args={[0.25, 0.13, 0.22]} />
       </mesh>
-      <mesh castShadow receiveShadow material={darkMaterial} position={[0, 0.15, 0]}>
+      <mesh castShadow receiveShadow material={graphiteMaterial} position={[0, 0.15, 0]}>
         <boxGeometry args={[0.18, 0.08, 0.16]} />
       </mesh>
       <mesh castShadow receiveShadow material={bodyMaterial} position={[0, 0.23, 0]}>
@@ -163,7 +163,7 @@ export function Quadrotor() {
 
       {motorPositions.map((motor, index) => (
         <group key={motor.label} position={motor.position}>
-          <mesh castShadow receiveShadow material={darkMaterial} position={[0, 0.045, 0]}>
+          <mesh castShadow receiveShadow material={graphiteMaterial} position={[0, 0.045, 0]}>
             <cylinderGeometry args={[0.075, 0.082, 0.08, 40]} />
           </mesh>
           <mesh castShadow receiveShadow material={bodyMaterial} position={[0, 0.105, 0]}>

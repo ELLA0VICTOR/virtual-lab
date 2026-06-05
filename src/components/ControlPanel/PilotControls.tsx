@@ -312,7 +312,7 @@ export function PilotControls() {
           : "Standby"
 
   return (
-    <Panel title="Pilot Controls" action={<Badge tone={pilotInput.enabled ? "live" : "warn"}>{sourceLabel}</Badge>}>
+    <Panel data-guide="pilot" title="Pilot Controls" action={<Badge tone={pilotInput.enabled ? "live" : "warn"}>{sourceLabel}</Badge>}>
       <div className="pilot-grid">
         <StickPad
           horizontalLabel="Yaw"

@@ -16,6 +16,7 @@ type CameraMode = "follow" | "top" | "side" | "free"
 function CameraController({ mode }: { mode: CameraMode }) {
   const { camera } = useThree()
   const smoothedTargetRef = useRef(new THREE.Vector3())
+  const smoothedPositionRef = useRef(new THREE.Vector3())
   const previousModeRef = useRef<CameraMode | null>(null)
 
   useFrame(() => {
@@ -27,20 +28,29 @@ function CameraController({ mode }: { mode: CameraMode }) {
 
     if (previousModeRef.current !== mode) {
       smoothedTarget.copy(target)
+      smoothedPositionRef.current.copy(camera.position)
       previousModeRef.current = mode
     } else {
       smoothedTarget.lerp(target, mode === "top" ? 0.018 : 0.055)
     }
 
+    const yaw = quadrotor.euler[2]
+    const forward = new THREE.Vector3(Math.cos(yaw), 0, Math.sin(yaw))
+    const chaseOffset = forward.clone().multiplyScalar(-4.15).add(new THREE.Vector3(0, 1.85, 0))
     const desired =
       mode === "top"
         ? new THREE.Vector3(smoothedTarget.x + 0.01, Math.max(6.8, smoothedTarget.y + 6.4), smoothedTarget.z + 0.01)
         : mode === "side"
           ? smoothedTarget.clone().add(new THREE.Vector3(4.4, 1.35, 0.08))
-          : smoothedTarget.clone().add(new THREE.Vector3(3.2, 1.65, 3.8))
+          : smoothedTarget.clone().add(chaseOffset)
 
-    camera.position.lerp(desired, mode === "top" ? 0.035 : 0.055)
-    camera.lookAt(smoothedTarget)
+    smoothedPositionRef.current.lerp(desired, mode === "follow" ? 0.035 : mode === "top" ? 0.035 : 0.055)
+    camera.position.copy(smoothedPositionRef.current)
+    const lookTarget =
+      mode === "follow"
+        ? smoothedTarget.clone().add(forward.clone().multiplyScalar(1.65)).add(new THREE.Vector3(0, 0.32, 0))
+        : smoothedTarget
+    camera.lookAt(lookTarget)
   })
 
   return null
@@ -55,7 +65,7 @@ export function DroneScene() {
   const yaw = useSimulationStore((state) => state.quadrotor.euler[2])
 
   return (
-    <section className="scene-panel boot-reveal" style={{ animationDelay: "90ms" }}>
+    <section className="scene-panel boot-reveal" data-guide="scene camera" style={{ animationDelay: "90ms" }}>
       <Canvas shadows camera={{ position: [3.2, 1.65, 3.8], fov: 42, near: 0.02, far: 120 }} dpr={[1, 1.7]}>
         <color attach="background" args={["#f8fafc"]} />
         <fog attach="fog" args={["#f8fafc", 14, 48]} />
@@ -96,7 +106,7 @@ export function DroneScene() {
         </div>
       </div>
 
-      <div className="camera-presets">
+      <div className="camera-presets" data-guide="camera">
         {(["free", "follow", "top", "side"] as const).map((mode) => (
           <Button key={mode} className={cameraMode === mode ? "button-primary" : ""} onClick={() => setCameraMode(mode)}>
             {mode === "free" ? "inspect" : mode}
