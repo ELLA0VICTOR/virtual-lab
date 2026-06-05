@@ -4,6 +4,8 @@ export const GRAVITY = 9.81
 export const PHYSICS_DT = 0.002
 export const HISTORY_SAMPLE_DT = 0.033
 export const HISTORY_LIMIT = 900
+// Center height where the visual guard ring/landing frame rests on the floor.
+export const GROUND_ALTITUDE = 0.21
 
 // Typical small research quadrotor parameters: 1.0-1.5 kg class, 200-250 mm arm length,
 // diagonal inertia in the low 10^-2 kg m^2 range, and rotor constants scaled for 10 in props.
@@ -23,7 +25,7 @@ export const YAW_TORQUE_RATIO = MOMENT_COEFFICIENT / THRUST_COEFFICIENT
 export const DEFAULT_MOTOR_FACTORS: Vec4 = [1, 1, 1, 1]
 
 export const INITIAL_STATE: QuadrotorState = {
-  position: [0, 0, 0.25],
+  position: [0, 0, GROUND_ALTITUDE],
   velocity: [0, 0, 0],
   euler: [0, 0, 0],
   quaternion: [0, 0, 0, 1],

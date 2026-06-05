@@ -1,12 +1,16 @@
 import { useEffect, useMemo, useRef } from "react"
 import { FiCheckCircle, FiChevronLeft, FiChevronRight, FiRefreshCw, FiXCircle } from "react-icons/fi"
-import { guidedLessons, type GuideAction, type GuideValidation } from "../../data/guidedLessons"
+import { guidedLessons, type GuideAction, type GuidePointer, type GuideValidation } from "../../data/guidedLessons"
 import { degreesToRadians } from "../../physics/vector"
 import { gainPresets } from "../../simulation/presets"
 import { useSimulationStore } from "../../simulation/simulationStore"
 import { Button } from "../ui/Button"
 
 const presetId = (id: string): string => gainPresets.find((preset) => preset.id === id)?.id ?? "well-tuned"
+
+const requestCameraMode = (mode: "follow" | "top" | "side" | "free"): void => {
+  window.dispatchEvent(new CustomEvent("virtual-lab-camera-mode", { detail: mode }))
+}
 
 const prepareCleanLesson = (preset: string): ReturnType<typeof useSimulationStore.getState> => {
   const store = useSimulationStore.getState()
@@ -35,6 +39,7 @@ const applyGuideAction = (action: GuideAction): void => {
   }
 
   if (action === "setupOrientation") {
+    requestCameraMode("free")
     const store = prepareCleanLesson("well-tuned")
     store.setSetpoint("altitude", 1.35)
     store.setPilotEnabled(true)
@@ -44,6 +49,7 @@ const applyGuideAction = (action: GuideAction): void => {
   }
 
   if (action === "startAxesDemo") {
+    requestCameraMode("follow")
     const store = prepareCleanLesson("well-tuned")
     store.setSetpoint("altitude", 1.7)
     store.setSetpoint("roll", degreesToRadians(8))
@@ -54,6 +60,7 @@ const applyGuideAction = (action: GuideAction): void => {
   }
 
   if (action === "setupLowP") {
+    requestCameraMode("follow")
     const store = prepareCleanLesson("overdamped")
     store.setSetpoint("altitude", 2.35)
     store.setRunning(true)
@@ -61,6 +68,7 @@ const applyGuideAction = (action: GuideAction): void => {
   }
 
   if (action === "setupOscillation") {
+    requestCameraMode("follow")
     const store = prepareCleanLesson("underdamped")
     store.setSetpoint("altitude", 2.65)
     store.setRunning(true)
@@ -68,6 +76,7 @@ const applyGuideAction = (action: GuideAction): void => {
   }
 
   if (action === "setupPayloadBias") {
+    requestCameraMode("follow")
     const store = prepareCleanLesson("overdamped")
     store.setSetpoint("altitude", 2.15)
     if (!useSimulationStore.getState().payloadEnabled) {
@@ -78,6 +87,7 @@ const applyGuideAction = (action: GuideAction): void => {
   }
 
   if (action === "setupMission") {
+    requestCameraMode("free")
     const store = prepareCleanLesson("untuned")
     store.resetMission()
     store.setSetpoint("altitude", 0.82)
@@ -91,6 +101,7 @@ const applyGuideAction = (action: GuideAction): void => {
   }
 
   if (action === "startMission") {
+    requestCameraMode("follow")
     const store = useSimulationStore.getState()
     store.setPilotEnabled(true)
     store.setRunning(true)
@@ -149,6 +160,34 @@ interface ValidationStatus {
   passed: boolean
   title: string
   hint: string
+}
+
+const pointerClassByTarget: Record<GuidePointer["target"], string> = {
+  blueNose: "pointer-blue-nose",
+  package: "pointer-package",
+  runControls: "pointer-run-controls",
+  pilotSticks: "pointer-pilot-sticks",
+  gainSliders: "pointer-gain-sliders",
+  charts: "pointer-charts",
+  missionControls: "pointer-mission-controls",
+}
+
+function GuidePointers({ pointers }: { pointers: GuidePointer[] | undefined }) {
+  if (!pointers?.length) return null
+
+  return (
+    <div className="guide-pointer-layer" aria-hidden="true">
+      {pointers.map((pointer) => (
+        <div
+          className={`guide-pointer ${pointer.arrow === false ? "label-only" : ""} ${pointerClassByTarget[pointer.target]}`.trim()}
+          key={`${pointer.target}-${pointer.label}`}
+        >
+          <span>{pointer.label}</span>
+          {pointer.arrow === false ? null : <b />}
+        </div>
+      ))}
+    </div>
+  )
 }
 
 const useValidationStatus = (validation: GuideValidation | undefined): ValidationStatus | null => {
@@ -250,6 +289,7 @@ export function TutorOverlay() {
   return (
     <>
       <div className="guide-scrim" aria-hidden="true" />
+      <GuidePointers pointers={step.pointers} />
       <section className={`tutor-card tutor-${placement}`} aria-live="polite">
         <div className="tutor-topline">
           <span>{guide.stage}</span>

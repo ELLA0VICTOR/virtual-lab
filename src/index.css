@@ -1206,6 +1206,112 @@ input:disabled {
   box-shadow: 0 0 0 3px rgba(107, 4, 114, 0.16), 0 16px 34px rgba(15, 23, 42, 0.16);
 }
 
+.guide-pointer-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 88;
+  pointer-events: none;
+}
+
+.guide-pointer {
+  position: fixed;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent-brand);
+  filter: drop-shadow(0 10px 20px rgba(15, 23, 42, 0.12));
+  --pointer-angle: 0deg;
+  --pointer-width: 58px;
+}
+
+.guide-pointer span {
+  max-width: 190px;
+  padding: 7px 9px;
+  color: var(--accent-brand);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--lms-brand-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.15;
+  white-space: nowrap;
+  box-shadow: var(--shadow-control);
+}
+
+.guide-pointer b {
+  position: relative;
+  display: block;
+  width: var(--pointer-width);
+  height: 2px;
+  background: currentColor;
+  border-radius: 999px;
+  transform: rotate(var(--pointer-angle));
+  transform-origin: left center;
+}
+
+.guide-pointer b::after {
+  position: absolute;
+  top: 50%;
+  right: -1px;
+  width: 8px;
+  height: 8px;
+  content: "";
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.guide-pointer.label-only {
+  gap: 0;
+}
+
+.pointer-blue-nose {
+  top: 38%;
+  left: 33%;
+  --pointer-angle: 20deg;
+  --pointer-width: 70px;
+}
+
+.pointer-package {
+  top: 41%;
+  right: 30%;
+}
+
+.pointer-run-controls {
+  top: 67%;
+  right: 360px;
+  --pointer-angle: 0deg;
+  --pointer-width: 62px;
+}
+
+.pointer-pilot-sticks {
+  top: 22%;
+  right: 322px;
+  --pointer-angle: 0deg;
+  --pointer-width: 64px;
+}
+
+.pointer-gain-sliders {
+  top: 34%;
+  right: 360px;
+  --pointer-angle: 0deg;
+  --pointer-width: 62px;
+}
+
+.pointer-charts {
+  bottom: 15%;
+  left: 40%;
+  --pointer-angle: 12deg;
+  --pointer-width: 76px;
+}
+
+.pointer-mission-controls {
+  top: 58%;
+  right: 360px;
+  --pointer-angle: 0deg;
+  --pointer-width: 62px;
+}
+
 .tutor-card {
   position: fixed;
   z-index: 92;
@@ -1450,6 +1556,10 @@ input:disabled {
 }
 
 @media (max-width: 1180px) {
+  .guide-pointer-layer {
+    display: none;
+  }
+
   .workspace-grid,
   .bottom-grid {
     grid-template-columns: 1fr;

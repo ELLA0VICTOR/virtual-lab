@@ -4,6 +4,21 @@ export type GuideAnchor = "scene" | "run" | "pilot" | "tune" | "charts" | "missi
 
 export type GuidePlacement = "left" | "right" | "top" | "bottom" | "center"
 
+export type GuidePointerTarget =
+  | "blueNose"
+  | "package"
+  | "runControls"
+  | "pilotSticks"
+  | "gainSliders"
+  | "charts"
+  | "missionControls"
+
+export interface GuidePointer {
+  target: GuidePointerTarget
+  label: string
+  arrow?: boolean
+}
+
 export type GuideAction =
   | "setupOrientation"
   | "enablePilot"
@@ -37,6 +52,7 @@ export interface GuideStep {
   requirePass?: boolean
   callout?: string
   primaryLabel?: string
+  pointers?: GuidePointer[]
 }
 
 export interface GuidedLesson {
@@ -65,12 +81,14 @@ export const guidedLessons: GuidedLesson[] = [
         action: "setupOrientation",
         placement: "right",
         callout: "Blue nose = forward direction. The guard ring and package mission give the simulation a real flight task.",
+        pointers: [{ target: "blueNose", label: "Blue nose points forward" }],
       },
       {
         title: "Run Control",
         body: "Use Run when you want the physics to move. Pause freezes the experiment so you can tune without fighting the drone.",
         anchor: "run",
         placement: "left",
+        pointers: [{ target: "runControls", label: "Run, pause, step, reset" }],
       },
       {
         title: "Manual Pilot Inputs",
@@ -80,6 +98,7 @@ export const guidedLessons: GuidedLesson[] = [
         validation: "pilotEnabled",
         placement: "left",
         primaryLabel: "Pilot is ready",
+        pointers: [{ target: "pilotSticks", label: "Two-stick flight input" }],
       },
       {
         title: "Watch A Controlled Step",
@@ -89,6 +108,7 @@ export const guidedLessons: GuidedLesson[] = [
         validation: "simObserved",
         placement: "top",
         primaryLabel: "I saw the response",
+        pointers: [{ target: "charts", label: "Measured value vs target" }],
       },
     ],
   },
@@ -108,6 +128,7 @@ export const guidedLessons: GuidedLesson[] = [
         validation: "simObserved",
         placement: "top",
         primaryLabel: "Slow response observed",
+        pointers: [{ target: "charts", label: "Slow climb curve" }],
       },
       {
         title: "Increase Altitude Kp",
@@ -117,6 +138,7 @@ export const guidedLessons: GuidedLesson[] = [
         requirePass: true,
         placement: "left",
         primaryLabel: "Gain changed",
+        pointers: [{ target: "gainSliders", label: "Adjust altitude Kp" }],
       },
       {
         title: "Check The Tradeoff",
@@ -125,6 +147,7 @@ export const guidedLessons: GuidedLesson[] = [
         validation: "hoverStable",
         placement: "top",
         primaryLabel: "Hover looks acceptable",
+        pointers: [{ target: "charts", label: "Look for overshoot" }],
       },
     ],
   },
@@ -144,6 +167,7 @@ export const guidedLessons: GuidedLesson[] = [
         validation: "oscillationObserved",
         placement: "top",
         primaryLabel: "Oscillation visible",
+        pointers: [{ target: "charts", label: "Ringing around target" }],
       },
       {
         title: "Add Kd Slowly",
@@ -153,6 +177,7 @@ export const guidedLessons: GuidedLesson[] = [
         requirePass: true,
         placement: "left",
         primaryLabel: "Kd adjusted",
+        pointers: [{ target: "gainSliders", label: "Add damping with Kd" }],
       },
       {
         title: "Compare The Shape",
@@ -161,6 +186,7 @@ export const guidedLessons: GuidedLesson[] = [
         validation: "hoverStable",
         placement: "top",
         primaryLabel: "Damping improved",
+        pointers: [{ target: "charts", label: "Cleaner settling" }],
       },
     ],
   },
@@ -180,6 +206,7 @@ export const guidedLessons: GuidedLesson[] = [
         validation: "payloadActive",
         placement: "top",
         primaryLabel: "Payload active",
+        pointers: [{ target: "charts", label: "Watch steady error" }],
       },
       {
         title: "Increase Ki Gently",
@@ -189,6 +216,7 @@ export const guidedLessons: GuidedLesson[] = [
         requirePass: true,
         placement: "left",
         primaryLabel: "Ki adjusted",
+        pointers: [{ target: "gainSliders", label: "Add small Ki" }],
       },
       {
         title: "Look For Offset Removal",
@@ -197,6 +225,7 @@ export const guidedLessons: GuidedLesson[] = [
         validation: "hoverStable",
         placement: "top",
         primaryLabel: "Offset reduced",
+        pointers: [{ target: "charts", label: "Offset should shrink" }],
       },
     ],
   },
@@ -215,6 +244,10 @@ export const guidedLessons: GuidedLesson[] = [
         action: "setupMission",
         placement: "left",
         callout: "Start untuned on purpose. The goal is to feel the problem, then improve it.",
+        pointers: [
+          { target: "missionControls", label: "Mission status and buttons" },
+          { target: "package", label: "Package starts here" },
+        ],
       },
       {
         title: "Fly To The Package",
@@ -224,6 +257,10 @@ export const guidedLessons: GuidedLesson[] = [
         validation: "missionCarrying",
         placement: "left",
         primaryLabel: "Package picked up",
+        pointers: [
+          { target: "pilotSticks", label: "Use gentle pitch and roll" },
+          { target: "package", label: "Settle over the package" },
+        ],
       },
       {
         title: "Tune For Cargo",
@@ -232,6 +269,7 @@ export const guidedLessons: GuidedLesson[] = [
         validation: "gainsChanged",
         placement: "left",
         primaryLabel: "Tuning changed",
+        pointers: [{ target: "gainSliders", label: "Retune under load" }],
       },
       {
         title: "Deliver The Payload",
@@ -240,6 +278,7 @@ export const guidedLessons: GuidedLesson[] = [
         validation: "missionDelivered",
         placement: "left",
         primaryLabel: "Delivery complete",
+        pointers: [{ target: "missionControls", label: "Drop only when stable" }],
       },
     ],
   },

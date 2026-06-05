@@ -1,5 +1,14 @@
 import { create } from "zustand"
-import { BASE_MASS, DEFAULT_MOTOR_FACTORS, GRAVITY, HISTORY_LIMIT, HISTORY_SAMPLE_DT, INITIAL_STATE, PHYSICS_DT } from "../physics/constants"
+import {
+  BASE_MASS,
+  DEFAULT_MOTOR_FACTORS,
+  GRAVITY,
+  GROUND_ALTITUDE,
+  HISTORY_LIMIT,
+  HISTORY_SAMPLE_DT,
+  INITIAL_STATE,
+  PHYSICS_DT,
+} from "../physics/constants"
 import { integrateRK4 } from "../physics/integrator"
 import { mixPlusConfiguration, motorOutputToControl } from "../physics/motorMixer"
 import { PIDController } from "../physics/pidController"
@@ -619,7 +628,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
       const { leftX, leftY, rightX, rightY, source } = state.pilotInput
       const profile = PILOT_PROFILES[source]
       const nextSetpoints: Setpoints = {
-        altitude: clamp(state.setpoints.altitude - leftY * profile.altitudeRate * deltaSeconds, 0.2, 5),
+        altitude: clamp(state.setpoints.altitude - leftY * profile.altitudeRate * deltaSeconds, GROUND_ALTITUDE, 5),
         yaw: wrapAngle(state.setpoints.yaw + leftX * profile.yawRate * deltaSeconds),
         roll: rightX * profile.maxTilt,
         pitch: -rightY * profile.maxTilt,

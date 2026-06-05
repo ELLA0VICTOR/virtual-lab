@@ -1,4 +1,5 @@
 import { makeState, quadrotorDerivative } from "./quadrotor"
+import { GROUND_ALTITUDE } from "./constants"
 import { wrapAngle } from "./vector"
 import type { DynamicsContext, StateDerivative } from "./quadrotor"
 import type { QuadrotorState, Vec3 } from "./types"
@@ -57,12 +58,12 @@ export const integrateRK4 = (state: QuadrotorState, context: DynamicsContext, dt
     ),
   )
 
-  if (next.position[2] >= 0.04) {
+  if (next.position[2] >= GROUND_ALTITUDE) {
     return next
   }
 
   return makeState(
-    [next.position[0], next.position[1], 0.04],
+    [next.position[0], next.position[1], GROUND_ALTITUDE],
     [next.velocity[0] * 0.45, next.velocity[1] * 0.45, Math.max(0, next.velocity[2])],
     [next.euler[0] * 0.96, next.euler[1] * 0.96, next.euler[2]],
     [next.angularVelocity[0] * 0.7, next.angularVelocity[1] * 0.7, next.angularVelocity[2] * 0.85],

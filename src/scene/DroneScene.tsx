@@ -1,4 +1,4 @@
-import { Suspense, useRef, useState } from "react"
+import { Suspense, useEffect, useRef, useState } from "react"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import { OrbitControls } from "@react-three/drei"
 import * as THREE from "three"
@@ -12,6 +12,8 @@ import { SetpointMarker } from "./SetpointMarker"
 import { TrajectoryTrail } from "./TrajectoryTrail"
 
 type CameraMode = "follow" | "top" | "side" | "free"
+
+const cameraModes = new Set<CameraMode>(["follow", "top", "side", "free"])
 
 function CameraController({ mode }: { mode: CameraMode }) {
   const { camera } = useThree()
@@ -57,12 +59,34 @@ function CameraController({ mode }: { mode: CameraMode }) {
 }
 
 export function DroneScene() {
-  const [cameraMode, setCameraMode] = useState<CameraMode>("follow")
+  const [cameraMode, setCameraMode] = useState<CameraMode>("free")
+  const running = useSimulationStore((state) => state.running)
   const altitude = useSimulationStore((state) => state.quadrotor.position[2])
   const velocity = useSimulationStore((state) => state.quadrotor.velocity[2])
   const roll = useSimulationStore((state) => state.quadrotor.euler[0])
   const pitch = useSimulationStore((state) => state.quadrotor.euler[1])
   const yaw = useSimulationStore((state) => state.quadrotor.euler[2])
+  const previousRunningRef = useRef(running)
+
+  useEffect(() => {
+    const handleCameraRequest = (event: Event) => {
+      const nextMode = (event as CustomEvent<CameraMode>).detail
+      if (cameraModes.has(nextMode)) {
+        setCameraMode(nextMode)
+      }
+    }
+
+    window.addEventListener("virtual-lab-camera-mode", handleCameraRequest)
+    return () => window.removeEventListener("virtual-lab-camera-mode", handleCameraRequest)
+  }, [])
+
+  useEffect(() => {
+    if (running && !previousRunningRef.current && cameraMode === "free") {
+      setCameraMode("follow")
+    }
+
+    previousRunningRef.current = running
+  }, [cameraMode, running])
 
   return (
     <section className="scene-panel boot-reveal" data-guide="scene camera" style={{ animationDelay: "90ms" }}>

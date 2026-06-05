@@ -1,4 +1,5 @@
 import { degreesToRadians, formatRadiansAsDegrees } from "../../physics/vector"
+import { GROUND_ALTITUDE } from "../../physics/constants"
 import { useSimulationStore } from "../../simulation/simulationStore"
 import { Panel } from "../ui/Panel"
 
@@ -16,11 +17,11 @@ export function SetpointControls() {
           <input
             className="number-input"
             type="number"
-            min={0.2}
+            min={GROUND_ALTITUDE}
             max={5}
             step={0.1}
             value={setpoints.altitude.toFixed(1)}
-            onChange={(event) => setSetpoint("altitude", clampNumber(Number(event.currentTarget.value), 0.2, 5))}
+            onChange={(event) => setSetpoint("altitude", clampNumber(Number(event.currentTarget.value), GROUND_ALTITUDE, 5))}
           />
         </label>
         <label className="field">
