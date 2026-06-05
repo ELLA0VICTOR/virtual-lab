@@ -1,4 +1,5 @@
 import { FiCheckCircle } from "react-icons/fi"
+import { GROUND_ALTITUDE } from "../../physics/constants"
 import { formatRadiansAsDegrees } from "../../physics/vector"
 import { useSimulationStore } from "../../simulation/simulationStore"
 import type { Challenge } from "../../data/challenges"
@@ -21,6 +22,10 @@ const isPassed = (challenge: Challenge, store: ReturnType<typeof useSimulationSt
     )
   }
 
+  if (challenge.id === "payload-hover") {
+    return store.payloadEnabled && store.elapsed > 2 && Math.abs(store.metrics.altitude.steadyStateError) < 0.16 && Math.abs(store.quadrotor.velocity[2]) < 0.3
+  }
+
   if (challenge.id === "wind-recovery") {
     const attitudeError =
       Math.abs(formatRadiansAsDegrees(store.metrics.roll.steadyStateError)) +
@@ -28,8 +33,23 @@ const isPassed = (challenge: Challenge, store: ReturnType<typeof useSimulationSt
     return Math.abs(store.metrics.altitude.steadyStateError) < 0.12 && attitudeError < 5 && store.motorFaultIndex === null
   }
 
-  const yawSettled = store.metrics.yaw.settlingTime !== null && store.metrics.yaw.settlingTime < 2.5
-  return Math.abs(formatRadiansAsDegrees(store.metrics.yaw.steadyStateError)) < 2 && yawSettled && !store.motorOutput.saturated.some(Boolean)
+  if (challenge.id === "yaw-zero") {
+    const yawSettled = store.metrics.yaw.settlingTime !== null && store.metrics.yaw.settlingTime < 2.5
+    return Math.abs(formatRadiansAsDegrees(store.metrics.yaw.steadyStateError)) < 2 && yawSettled && !store.motorOutput.saturated.some(Boolean)
+  }
+
+  if (challenge.id === "motor-fault-hover") {
+    const attitudeError =
+      Math.abs(formatRadiansAsDegrees(store.quadrotor.euler[0])) + Math.abs(formatRadiansAsDegrees(store.quadrotor.euler[1]))
+    return store.motorFaultIndex !== null && store.elapsed > 2 && Math.abs(store.metrics.altitude.steadyStateError) < 0.24 && attitudeError < 14
+  }
+
+  if (challenge.id === "precision-landing") {
+    const level = Math.abs(store.quadrotor.euler[0]) < 0.2 && Math.abs(store.quadrotor.euler[1]) < 0.2
+    return store.elapsed > 2 && store.quadrotor.position[2] <= GROUND_ALTITUDE + 0.035 && Math.abs(store.quadrotor.velocity[2]) < 0.16 && level
+  }
+
+  return store.mission.status === "delivered"
 }
 
 export function ChallengeCard({ challenge, active, onSelect, onSetup }: ChallengeCardProps) {

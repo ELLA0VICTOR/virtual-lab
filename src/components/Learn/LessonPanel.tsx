@@ -1,10 +1,11 @@
 import { FiCheckCircle, FiPlayCircle, FiX } from "react-icons/fi"
+import { GROUND_ALTITUDE } from "../../physics/constants"
 import { degreesToRadians, formatRadiansAsDegrees } from "../../physics/vector"
 import { challenges } from "../../data/challenges"
 import { guidedLessons } from "../../data/guidedLessons"
 import { lessons, type LessonScenario } from "../../data/lessons"
 import { gainPresets } from "../../simulation/presets"
-import { useSimulationStore } from "../../simulation/simulationStore"
+import { createTrainingScenario, useSimulationStore } from "../../simulation/simulationStore"
 import { Button } from "../ui/Button"
 import { Tab } from "../ui/Tab"
 import { ChallengeCard } from "./ChallengeCard"
@@ -14,6 +15,7 @@ const presetId = (name: string): string => gainPresets.find((preset) => preset.i
 const runLessonScenario = (scenario: LessonScenario): void => {
   const store = useSimulationStore.getState()
   store.resetDisturbances()
+  store.clearTrainingScenario()
 
   if (scenario === "axes") {
     store.loadPreset(presetId("well-tuned"))
@@ -61,13 +63,52 @@ const setupChallenge = (challengeId: string): void => {
   const store = useSimulationStore.getState()
   store.resetSimulation()
   store.loadPreset(presetId("well-tuned"))
+  store.clearTrainingScenario()
 
   if (challengeId === "altitude-step") {
     store.setSetpoint("altitude", 2.4)
+    store.setTrainingScenario(
+      createTrainingScenario({
+        kind: "altitude-step",
+        title: "Altitude challenge target",
+        message: "Tune for a clean step response with limited overshoot.",
+        targetPosition: [0, 0, 2.4],
+        radius: 0.62,
+        altitudeBand: [2.25, 2.55],
+        accent: "purple",
+      }),
+    )
+  }
+
+  if (challengeId === "payload-hover") {
+    store.setSetpoint("altitude", 2.1)
+    if (!useSimulationStore.getState().payloadEnabled) store.togglePayload()
+    store.setTrainingScenario(
+      createTrainingScenario({
+        kind: "hover-zone",
+        title: "Payload hover target",
+        message: "Use integral action to remove the extra-mass offset.",
+        targetPosition: [0, 0, 2.1],
+        radius: 0.66,
+        altitudeBand: [1.92, 2.28],
+        accent: "amber",
+      }),
+    )
   }
 
   if (challengeId === "wind-recovery") {
     store.setSetpoint("altitude", 1.8)
+    store.setTrainingScenario(
+      createTrainingScenario({
+        kind: "wind-recovery",
+        title: "Wind recovery target",
+        message: "Recover to this hover band after the gust.",
+        targetPosition: [0, 0, 1.8],
+        radius: 0.78,
+        altitudeBand: [1.6, 2],
+        accent: "blue",
+      }),
+    )
     store.setRunning(true)
     window.setTimeout(() => useSimulationStore.getState().injectWind(), 360)
     return
@@ -76,6 +117,62 @@ const setupChallenge = (challengeId: string): void => {
   if (challengeId === "yaw-zero") {
     store.setSetpoint("altitude", 1.8)
     store.setSetpoint("yaw", degreesToRadians(90))
+    store.setTrainingScenario(
+      createTrainingScenario({
+        kind: "yaw-align",
+        title: "Yaw challenge target",
+        message: "Capture the commanded heading without sustained error.",
+        targetPosition: [0, 0, 1.8],
+        radius: 0.68,
+        targetYaw: degreesToRadians(90),
+        altitudeBand: [1.62, 1.98],
+        accent: "blue",
+      }),
+    )
+  }
+
+  if (challengeId === "motor-fault-hover") {
+    store.setSetpoint("altitude", 1.72)
+    store.setMotorFault(1)
+    store.setTrainingScenario(
+      createTrainingScenario({
+        kind: "motor-fault",
+        title: "Motor fault hover target",
+        message: "Hold altitude with one weakened motor.",
+        targetPosition: [0, 0, 1.72],
+        radius: 0.72,
+        altitudeBand: [1.5, 1.94],
+        accent: "red",
+      }),
+    )
+  }
+
+  if (challengeId === "precision-landing") {
+    store.setSetpoint("altitude", 1.15)
+    store.setPilotEnabled(true)
+    store.centerPilotInput()
+    store.setTrainingScenario(
+      createTrainingScenario({
+        kind: "precision-landing",
+        title: "Landing challenge pad",
+        message: "Descend softly and keep the drone level.",
+        targetPosition: [0, 0, GROUND_ALTITUDE],
+        radius: 0.76,
+        altitudeBand: [GROUND_ALTITUDE, 0.55],
+        accent: "green",
+      }),
+    )
+  }
+
+  if (challengeId === "delivery-run") {
+    store.loadPreset(presetId("untuned"))
+    store.resetMission()
+    store.setSetpoint("altitude", 0.82)
+    store.setSetpoint("roll", 0)
+    store.setSetpoint("pitch", 0)
+    store.setSetpoint("yaw", 0)
+    store.setPilotEnabled(true)
+    store.centerPilotInput()
   }
 
   store.setRunning(true)

@@ -9,6 +9,7 @@ import { Environment } from "./Environment"
 import { MissionObjects } from "./MissionObjects"
 import { Quadrotor } from "./Quadrotor"
 import { SetpointMarker } from "./SetpointMarker"
+import { TrainingObjects } from "./TrainingObjects"
 import { TrajectoryTrail } from "./TrajectoryTrail"
 
 type CameraMode = "follow" | "top" | "side" | "free"
@@ -96,6 +97,7 @@ export function DroneScene() {
         <Suspense fallback={null}>
           <Environment />
           <MissionObjects />
+          <TrainingObjects />
           <SetpointMarker />
           <TrajectoryTrail />
           <Quadrotor />

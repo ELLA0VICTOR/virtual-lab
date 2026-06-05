@@ -42,6 +42,19 @@ interface ControllerBank {
 
 export type MissionStatus = "ready" | "carrying" | "delivered" | "dropped"
 export type PilotSource = "idle" | "virtual" | "keyboard" | "gamepad"
+export type TrainingScenarioKind =
+  | "none"
+  | "hover-zone"
+  | "altitude-step"
+  | "manual-flight"
+  | "coupled-flight"
+  | "yaw-align"
+  | "wind-recovery"
+  | "motor-fault"
+  | "precision-landing"
+  | "delivery"
+
+export type TrainingScenarioAccent = "blue" | "purple" | "amber" | "green" | "red"
 
 export interface PilotInput {
   enabled: boolean
@@ -66,6 +79,17 @@ export interface MissionState {
   message: string
 }
 
+export interface TrainingScenarioState {
+  kind: TrainingScenarioKind
+  title: string
+  message: string
+  targetPosition: Vec3 | null
+  radius: number
+  targetYaw: number | null
+  altitudeBand: [number, number] | null
+  accent: TrainingScenarioAccent
+}
+
 export interface SimulationStore {
   quadrotor: QuadrotorState
   elapsed: number
@@ -80,6 +104,7 @@ export interface SimulationStore {
   payloadEnabled: boolean
   motorFaultIndex: number | null
   mission: MissionState
+  trainingScenario: TrainingScenarioState
   pilotInput: PilotInput
   activePresetId: string
   stepStartedAt: number
@@ -107,6 +132,8 @@ export interface SimulationStore {
   pickupPackage: () => void
   dropPackage: () => void
   resetMission: () => void
+  setTrainingScenario: (scenario: TrainingScenarioState) => void
+  clearTrainingScenario: () => void
   setPilotEnabled: (enabled: boolean) => void
   setPilotInput: (input: PilotInputUpdate) => void
   centerPilotInput: () => void
@@ -196,6 +223,20 @@ const createMissionState = (): MissionState => ({
   dropAvailable: false,
   lastDropError: null,
   message: "Fly near the package and hold a steady low hover to pick it up.",
+})
+
+export const createTrainingScenario = (
+  overrides: Partial<TrainingScenarioState> = {},
+): TrainingScenarioState => ({
+  kind: "none",
+  title: "",
+  message: "",
+  targetPosition: null,
+  radius: 0.7,
+  targetYaw: null,
+  altitudeBand: null,
+  accent: "purple",
+  ...overrides,
 })
 
 const createPilotInput = (): PilotInput => ({
@@ -350,6 +391,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
   payloadEnabled: false,
   motorFaultIndex: null,
   mission: evaluateMission(createMissionState(), INITIAL_STATE),
+  trainingScenario: createTrainingScenario(),
   pilotInput: createPilotInput(),
   activePresetId: defaultPreset.id,
   stepStartedAt: 0,
@@ -418,6 +460,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
       payloadEnabled: false,
       motorFaultIndex: null,
       mission: evaluateMission(createMissionState(), INITIAL_STATE),
+      trainingScenario: createTrainingScenario(),
       pilotInput: createPilotInput(),
       stepStartedAt: 0,
       lastHistoryAt: 0,
@@ -578,6 +621,9 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
     }),
 
   resetMission: () => set((state) => ({ mission: evaluateMission(createMissionState(), state.quadrotor) })),
+
+  setTrainingScenario: (scenario) => set({ trainingScenario: scenario }),
+  clearTrainingScenario: () => set({ trainingScenario: createTrainingScenario() }),
 
   setPilotEnabled: (enabled) =>
     set((state) => ({

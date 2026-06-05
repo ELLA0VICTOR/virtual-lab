@@ -1319,6 +1319,13 @@ input:disabled {
   --pointer-width: 62px;
 }
 
+.pointer-scenario-target {
+  top: 40%;
+  left: 22%;
+  --pointer-angle: 8deg;
+  --pointer-width: 74px;
+}
+
 .tutor-card {
   position: fixed;
   z-index: 92;
