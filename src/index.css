@@ -755,12 +755,9 @@ input:disabled {
 .pilot-guide strong {
   display: block;
   margin-top: 3px;
-  overflow: hidden;
   color: var(--text-primary);
   font-size: 0.72rem;
   line-height: 1.15;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .mission-map {
@@ -1027,6 +1024,16 @@ input:disabled {
 
 .course-card.complete {
   border-color: rgba(22, 163, 74, 0.35);
+}
+
+.course-card.complete .course-status {
+  color: var(--success);
+}
+
+.course-card.complete .course-stage {
+  color: var(--success);
+  background: rgba(22, 163, 74, 0.08);
+  border-color: rgba(22, 163, 74, 0.24);
 }
 
 .course-stage {

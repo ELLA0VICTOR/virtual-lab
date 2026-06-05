@@ -92,7 +92,7 @@ export const guidedLessons: GuidedLesson[] = [
       },
       {
         title: "Manual Pilot Inputs",
-        body: "The left stick handles lift and yaw. The right stick handles pitch and roll. The keyboard arrows use the right-stick movement for quick control.",
+        body: "The left stick handles lift and yaw. The right stick handles pitch and roll. On keyboard, W/A/S/D act like the left stick while the arrow keys act like the right stick.",
         anchor: "pilot",
         action: "enablePilot",
         validation: "pilotEnabled",

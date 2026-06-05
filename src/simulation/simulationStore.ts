@@ -289,8 +289,8 @@ const PILOT_PROFILES: Record<PilotSource, { maxTilt: number; yawRate: number; al
   },
   keyboard: {
     maxTilt: degreesToRadians(15),
-    yawRate: 0,
-    altitudeRate: 0,
+    yawRate: degreesToRadians(54),
+    altitudeRate: 0.7,
   },
   virtual: {
     maxTilt: degreesToRadians(18),
@@ -630,7 +630,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
       const nextSetpoints: Setpoints = {
         altitude: clamp(state.setpoints.altitude - leftY * profile.altitudeRate * deltaSeconds, GROUND_ALTITUDE, 5),
         yaw: wrapAngle(state.setpoints.yaw + leftX * profile.yawRate * deltaSeconds),
-        roll: rightX * profile.maxTilt,
+        roll: -rightX * profile.maxTilt,
         pitch: -rightY * profile.maxTilt,
       }
 

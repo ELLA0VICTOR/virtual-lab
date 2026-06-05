@@ -13,6 +13,10 @@ const PILOT_KEY_BY_CODE: Record<string, string> = {
   ArrowDown: "ArrowDown",
   ArrowLeft: "ArrowLeft",
   ArrowRight: "ArrowRight",
+  KeyW: "w",
+  KeyA: "a",
+  KeyS: "s",
+  KeyD: "d",
 }
 const ARROW_KEYS = new Set(["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"])
 const KEYBOARD_KEYS = new Set(Object.values(PILOT_KEY_BY_CODE))
@@ -68,6 +72,24 @@ const detectRightRollAxis = (axes: readonly number[], neutralAxes: readonly numb
 
 const isTypingTarget = (target: EventTarget | null): boolean =>
   target instanceof HTMLElement && (target.matches("input, textarea, select") || target.isContentEditable)
+
+const isMissionKeyTarget = (target: EventTarget | null): boolean =>
+  target instanceof HTMLElement &&
+  (target.matches("input, textarea, select, button") || target.closest("[role='button']") !== null || target.isContentEditable)
+
+const triggerMissionShortcut = (): void => {
+  const store = useSimulationStore.getState()
+  const mission = store.mission
+
+  if (mission.status === "ready" && mission.pickupAvailable) {
+    store.pickupPackage()
+    return
+  }
+
+  if (mission.status === "carrying" && mission.dropAvailable) {
+    store.dropPackage()
+  }
+}
 
 const normalizePilotKey = (event: KeyboardEvent): string => {
   const codeKey = PILOT_KEY_BY_CODE[event.code]
@@ -235,20 +257,30 @@ export function PilotControls() {
 
     const updateKeyboardInput = () => {
       const hasKey = (...keys: string[]) => keys.some((key) => activeKeys.has(key))
+      const leftX = Number(hasKey("d", "KeyD")) - Number(hasKey("a", "KeyA"))
+      const leftY = Number(hasKey("s", "KeyS")) - Number(hasKey("w", "KeyW"))
       const rightX = Number(hasKey("ArrowRight")) - Number(hasKey("ArrowLeft"))
       const rightY = Number(hasKey("ArrowDown")) - Number(hasKey("ArrowUp"))
-      const hasInput = rightX !== 0 || rightY !== 0
+      const hasInput = leftX !== 0 || leftY !== 0 || rightX !== 0 || rightY !== 0
 
       setPilotInput({
         source: hasInput ? "keyboard" : "idle",
-        leftX: 0,
-        leftY: 0,
+        leftX,
+        leftY,
         rightX,
         rightY,
       })
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.code === "Space" || event.key === " ") && !isMissionKeyTarget(event.target)) {
+        event.preventDefault()
+        if (!event.repeat) {
+          triggerMissionShortcut()
+        }
+        return
+      }
+
       const key = normalizePilotKey(event)
       if (!KEYBOARD_KEYS.has(key) || isTypingTarget(event.target)) return
       event.preventDefault()
@@ -353,12 +385,20 @@ export function PilotControls() {
 
       <div className="pilot-guide">
         <div>
-          <span>Keyboard</span>
-          <strong>Arrows: move</strong>
+          <span>Left keys</span>
+          <strong>W/S lift | A/D yaw</strong>
+        </div>
+        <div>
+          <span>Right keys</span>
+          <strong>Arrows pitch/roll</strong>
         </div>
         <div>
           <span>Gamepad</span>
-          <strong>USB auto | Center trims</strong>
+          <strong>USB auto trim</strong>
+        </div>
+        <div>
+          <span>Mission key</span>
+          <strong>Space pickup/drop</strong>
         </div>
       </div>
 
