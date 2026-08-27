@@ -477,6 +477,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
       let elapsed = state.elapsed
       let motorOutput = state.motorOutput
       let history = state.history
+      let historyChanged = false
       let lastHistoryAt = state.lastHistoryAt
       let disturbance = state.disturbances
       let mission = state.mission
@@ -502,6 +503,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
 
         if (elapsed - lastHistoryAt >= HISTORY_SAMPLE_DT) {
           history = appendHistory(history, makeHistorySample(elapsed, quadrotor, state.setpoints, motorOutput))
+          historyChanged = true
           lastHistoryAt = elapsed
         }
       }
@@ -524,7 +526,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
         lastHistoryAt,
         disturbances: disturbance,
         mission,
-        metrics: computeMetrics(history, state.stepStartedAt),
+        metrics: historyChanged ? computeMetrics(history, state.stepStartedAt) : state.metrics,
       }
     }),
 

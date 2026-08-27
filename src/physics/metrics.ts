@@ -27,24 +27,31 @@ export const computeResponseMetrics = (
   channel: MetricChannel,
   stepStartedAt: number,
 ): ResponseMetrics => {
-  const samples = history.filter((sample) => sample.t >= stepStartedAt)
-  if (samples.length < 4) {
+  let startIndex = history.findIndex((sample) => sample.t >= stepStartedAt)
+  if (startIndex < 0) {
     return EMPTY_METRICS
   }
 
-  const first = samples[0]
+  const sampleCount = history.length - startIndex
+  if (sampleCount < 4) {
+    return EMPTY_METRICS
+  }
+
+  const first = history[startIndex]
   const initial = valueFor(first, channel)
-  const target = setpointFor(samples[samples.length - 1], channel)
+  const latestSample = history[history.length - 1]
+  const target = setpointFor(latestSample, channel)
   const amplitude = target - initial
   const absAmplitude = Math.abs(amplitude)
-  const latest = valueFor(samples[samples.length - 1], channel)
+  const latest = valueFor(latestSample, channel)
   const steadyStateError = target - latest
   const direction = Math.sign(amplitude) || 1
-  const values = samples.map((sample) => valueFor(sample, channel))
-  const peak =
-    direction > 0
-      ? values.reduce((max, value) => Math.max(max, value), values[0])
-      : values.reduce((min, value) => Math.min(min, value), values[0])
+  let peak = valueFor(first, channel)
+
+  for (let index = startIndex + 1; index < history.length; index += 1) {
+    const value = valueFor(history[index], channel)
+    peak = direction > 0 ? Math.max(peak, value) : Math.min(peak, value)
+  }
 
   if (absAmplitude < 0.0001) {
     return {
@@ -58,21 +65,32 @@ export const computeResponseMetrics = (
 
   const threshold10 = initial + amplitude * 0.1
   const threshold90 = initial + amplitude * 0.9
-  const t10 = samples.find((sample) => direction * (valueFor(sample, channel) - threshold10) >= 0)?.t
-  const t90 = samples.find((sample) => direction * (valueFor(sample, channel) - threshold90) >= 0)?.t
-  const riseTime = t10 !== undefined && t90 !== undefined ? Math.max(0, t90 - t10) : null
-  const overshoot = Math.max(0, (direction * (peak - target) / absAmplitude) * 100)
   const tolerance = Math.max(absAmplitude * 0.02, channel === "altitude" ? 0.02 : 0.01)
-  let settlingTime: number | null = null
+  let t10: number | undefined
+  let t90: number | undefined
+  let lastUnsettledIndex = startIndex - 1
 
-  for (let index = 0; index < samples.length; index += 1) {
-    const slice = samples.slice(index)
-    const settled = slice.every((sample) => Math.abs(valueFor(sample, channel) - target) <= tolerance)
-    if (settled) {
-      settlingTime = samples[index].t - stepStartedAt
-      break
+  for (let index = startIndex; index < history.length; index += 1) {
+    const sample = history[index]
+    const value = valueFor(sample, channel)
+
+    if (t10 === undefined && direction * (value - threshold10) >= 0) {
+      t10 = sample.t
+    }
+
+    if (t90 === undefined && direction * (value - threshold90) >= 0) {
+      t90 = sample.t
+    }
+
+    if (Math.abs(value - target) > tolerance) {
+      lastUnsettledIndex = index
     }
   }
+
+  const riseTime = t10 !== undefined && t90 !== undefined ? Math.max(0, t90 - t10) : null
+  const overshoot = Math.max(0, (direction * (peak - target) / absAmplitude) * 100)
+  startIndex = Math.max(startIndex, lastUnsettledIndex + 1)
+  const settlingTime = startIndex < history.length ? history[startIndex].t - stepStartedAt : null
 
   return {
     riseTime,

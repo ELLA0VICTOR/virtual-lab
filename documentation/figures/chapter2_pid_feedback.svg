@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="600" viewBox="0 0 1400 600" role="img" aria-labelledby="title desc">
+  <title id="title">PID feedback loop for the simulated quadrotor</title>
+  <desc id="desc">A setpoint passes through a summing junction, PID controller, motor mixer, quadrotor model and output. Disturbances enter the model, and simulated altitude and attitude are fed directly to the negative summing input.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 8 4 L 0 8 Z" fill="#000000"/>
+    </marker>
+    <style>
+      .block { fill: #ffffff; stroke: #000000; stroke-width: 2; }
+      .line { fill: none; stroke: #000000; stroke-width: 2; stroke-linecap: square; stroke-linejoin: miter; marker-end: url(#arrow); }
+      .label { fill: #000000; font-family: Arial, Helvetica, sans-serif; font-size: 18px; text-anchor: middle; }
+      .signal { fill: #000000; font-family: Arial, Helvetica, sans-serif; font-size: 15px; text-anchor: middle; }
+      .sign { fill: #000000; font-family: Arial, Helvetica, sans-serif; font-size: 18px; text-anchor: middle; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1400" height="600" fill="#ffffff"/>
+
+  <rect class="block" x="40" y="235" width="160" height="80"/>
+  <text class="label" x="120" y="281">Setpoint r(t)</text>
+
+  <path class="line" d="M 200 275 H 249"/>
+  <circle class="block" cx="280" cy="275" r="30"/>
+  <text class="label" x="280" y="282">Σ</text>
+  <text class="sign" x="237" y="267">+</text>
+  <text class="sign" x="294" y="326">−</text>
+
+  <path class="line" d="M 310 275 H 364"/>
+  <text class="signal" x="337" y="260">e(t)</text>
+  <rect class="block" x="365" y="225" width="180" height="100"/>
+  <text class="label" x="455" y="270">PID</text>
+  <text class="label" x="455" y="294">controller</text>
+
+  <path class="line" d="M 545 275 H 599"/>
+  <text class="signal" x="572" y="260">u(t)</text>
+  <rect class="block" x="600" y="225" width="180" height="100"/>
+  <text class="label" x="690" y="270">Motor</text>
+  <text class="label" x="690" y="294">mixer</text>
+
+  <path class="line" d="M 780 275 H 849"/>
+  <text class="signal" x="814" y="260">f₁ ... f₄</text>
+  <rect class="block" x="850" y="225" width="200" height="100"/>
+  <text class="label" x="950" y="270">Quadrotor</text>
+  <text class="label" x="950" y="294">model</text>
+
+  <rect class="block" x="870" y="70" width="160" height="70"/>
+  <text class="label" x="950" y="112">Disturbances d(t)</text>
+  <path class="line" d="M 950 140 V 224"/>
+
+  <path class="line" d="M 1050 275 H 1144"/>
+  <rect class="block" x="1145" y="235" width="160" height="80"/>
+  <text class="label" x="1225" y="281">Output y(t)</text>
+
+  <path class="line" d="M 1225 315 V 455 H 280 V 306"/>
+  <rect x="550" y="428" width="350" height="25" fill="#ffffff"/>
+  <text class="signal" x="725" y="446">simulated altitude and attitude</text>
+</svg>

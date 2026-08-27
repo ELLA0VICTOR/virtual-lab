@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1000" viewBox="0 0 1200 1000" role="img" aria-labelledby="title desc">
+  <title id="title">System architecture of the web-based virtual laboratory</title>
+  <desc id="desc">A separate Next.js host LMS embeds a standalone Vite, React and TypeScript virtual laboratory through an iframe whose final embedding is pending. Inside the laboratory, learner inputs pass through the React interface and Zustand store to PID controllers, a motor mixer, the quadrotor model and RK4 integrator. The calculated state provides ideal feedback and supplies the Three.js scene, uPlot charts and metrics, and learning activities.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7.2" refY="4" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#000000"/>
+    </marker>
+    <style>
+      .box { fill: #ffffff; stroke: #000000; stroke-width: 1.5; }
+      .layer { fill: #ffffff; stroke: #000000; stroke-width: 1; }
+      .edge { fill: none; stroke: #000000; stroke-width: 1.75; stroke-linecap: square; stroke-linejoin: miter; marker-end: url(#arrow); }
+      .line { fill: none; stroke: #000000; stroke-width: 1.75; stroke-linecap: square; stroke-linejoin: miter; }
+      .main-label { font: 700 19px Arial, Helvetica, sans-serif; fill: #000000; }
+      .layer-label { font: 700 13px Arial, Helvetica, sans-serif; letter-spacing: 0.8px; fill: #000000; }
+      .box-title { font: 700 17px Arial, Helvetica, sans-serif; fill: #000000; }
+      .box-note { font: 13px Arial, Helvetica, sans-serif; fill: #000000; }
+      .edge-label { font: 12px Arial, Helvetica, sans-serif; fill: #000000; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="1000" fill="#ffffff"/>
+
+  <!-- Standalone application boundary and internal layers -->
+  <rect x="40" y="150" width="1120" height="820" fill="#ffffff" stroke="#000000" stroke-width="1.5" stroke-dasharray="8 5"/>
+  <text x="60" y="181" class="main-label">Standalone virtual laboratory — Vite + React + TypeScript</text>
+
+  <rect x="70" y="210" width="1060" height="160" class="layer"/>
+  <text x="90" y="238" class="layer-label">INTERFACE AND STATE</text>
+
+  <rect x="70" y="400" width="1060" height="340" class="layer"/>
+  <text x="90" y="428" class="layer-label">CONTROL AND PHYSICS</text>
+
+  <rect x="70" y="770" width="1060" height="175" class="layer"/>
+  <text x="90" y="798" class="layer-label">OUTPUTS</text>
+
+  <!-- Host application -->
+  <rect x="350" y="25" width="500" height="65" class="box"/>
+  <text x="600" y="52" text-anchor="middle" class="box-title">Next.js host LMS</text>
+  <text x="600" y="74" text-anchor="middle" class="box-note">Separate application</text>
+
+  <!-- Interface and state boxes -->
+  <rect x="100" y="260" width="230" height="75" class="box"/>
+  <text x="215" y="289" text-anchor="middle" class="box-title">Learner inputs</text>
+  <text x="215" y="315" text-anchor="middle" class="box-note">Setpoints · gains · controls</text>
+
+  <rect x="485" y="260" width="230" height="75" class="box"/>
+  <text x="600" y="289" text-anchor="middle" class="box-title">React interface</text>
+  <text x="600" y="315" text-anchor="middle" class="box-note">Panels · controls · lessons</text>
+
+  <rect x="870" y="260" width="230" height="75" class="box"/>
+  <text x="985" y="289" text-anchor="middle" class="box-title">Zustand store</text>
+  <text x="985" y="315" text-anchor="middle" class="box-note">Configuration · state · history</text>
+
+  <!-- Control and physics boxes -->
+  <rect x="100" y="480" width="185" height="90" class="box"/>
+  <text x="192.5" y="515" text-anchor="middle" class="box-title">PID controllers</text>
+  <text x="192.5" y="542" text-anchor="middle" class="box-note">z · φ · θ · ψ</text>
+
+  <rect x="350" y="480" width="185" height="90" class="box"/>
+  <text x="442.5" y="515" text-anchor="middle" class="box-title">Motor mixer</text>
+  <text x="442.5" y="542" text-anchor="middle" class="box-note">Four motor commands</text>
+
+  <rect x="600" y="480" width="260" height="90" class="box"/>
+  <text x="730" y="515" text-anchor="middle" class="box-title">Quadrotor model + RK4</text>
+  <text x="730" y="542" text-anchor="middle" class="box-note">Rigid-body equations · fixed step</text>
+
+  <rect x="960" y="480" width="140" height="90" class="box"/>
+  <text x="1030" y="513" text-anchor="middle" class="box-title">Calculated</text>
+  <text x="1030" y="536" text-anchor="middle" class="box-title">state</text>
+  <text x="1030" y="558" text-anchor="middle" class="box-note">x(k + 1)</text>
+
+  <!-- Output boxes -->
+  <rect x="100" y="840" width="270" height="75" class="box"/>
+  <text x="235" y="869" text-anchor="middle" class="box-title">Three.js scene</text>
+  <text x="235" y="895" text-anchor="middle" class="box-note">Drone pose and environment</text>
+
+  <rect x="465" y="840" width="270" height="75" class="box"/>
+  <text x="600" y="869" text-anchor="middle" class="box-title">uPlot charts + metrics</text>
+  <text x="600" y="895" text-anchor="middle" class="box-note">Telemetry and response measures</text>
+
+  <rect x="830" y="840" width="270" height="75" class="box"/>
+  <text x="965" y="869" text-anchor="middle" class="box-title">Learning activities</text>
+  <text x="965" y="895" text-anchor="middle" class="box-note">Lessons · missions · checks</text>
+
+  <!-- Embedding and interface flow -->
+  <path d="M600 90 V135 H800 V195 H600 V256" class="edge"/>
+  <text x="620" y="122" class="edge-label">iframe (embedding pending)</text>
+
+  <path d="M330 297.5 H481" class="edge"/>
+  <path d="M715 297.5 H866" class="edge"/>
+
+  <!-- Store configuration and calculated-state update -->
+  <path d="M985 335 V455 H192.5 V476" class="edge"/>
+  <rect x="469" y="437" width="143" height="19" fill="#ffffff"/>
+  <text x="540.5" y="451" text-anchor="middle" class="edge-label">references + gains</text>
+
+  <path d="M1100 525 H1145 V297.5 H1104" class="edge"/>
+  <rect x="1045" y="377" width="91" height="19" fill="#ffffff"/>
+  <text x="1134" y="391" text-anchor="end" class="edge-label">state + history</text>
+
+  <!-- Closed-loop simulation -->
+  <path d="M285 525 H346" class="edge"/>
+  <path d="M535 525 H596" class="edge"/>
+  <path d="M860 525 H956" class="edge"/>
+
+  <path d="M990 570 V660 H192.5 V574" class="edge"/>
+  <rect x="446" y="647" width="300" height="22" fill="#ffffff"/>
+  <text x="596" y="662" text-anchor="middle" class="edge-label">ideal calculated state feedback</text>
+
+  <!-- State distribution bus -->
+  <path d="M1070 570 V817 H235" class="line"/>
+  <circle cx="1070" cy="817" r="2.5" fill="#000000"/>
+  <circle cx="965" cy="817" r="2.5" fill="#000000"/>
+  <circle cx="600" cy="817" r="2.5" fill="#000000"/>
+  <circle cx="235" cy="817" r="2.5" fill="#000000"/>
+  <path d="M235 817 V836" class="edge"/>
+  <path d="M600 817 V836" class="edge"/>
+  <path d="M965 817 V836" class="edge"/>
+</svg>

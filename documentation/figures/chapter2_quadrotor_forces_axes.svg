@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="1600" height="1120" viewBox="0 0 1600 1120"
+     role="img" aria-labelledby="title desc">
+  <title id="title">Quadrotor body axes, control moments and vertical forces</title>
+  <desc id="desc">Engineering schematic of a plus-configuration quadrotor. Motor one is at the front, motor two at the right, motor three at the rear, and motor four at the left. Body axes, roll, pitch, yaw, total thrust and weight are indicated.</desc>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 Z" fill="#000000"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="1120" fill="#ffffff"/>
+
+  <g fill="none" stroke="#000000" stroke-width="2">
+    <!-- Plus-frame arms, drawn as paired structural lines. -->
+    <path d="M548 500 V190 M572 500 V190"/>
+    <path d="M548 500 V810 M572 500 V810"/>
+    <path d="M560 488 H250 M560 512 H250"/>
+    <path d="M560 488 H870 M560 512 H870"/>
+
+    <!-- Rotor discs. -->
+    <circle cx="560" cy="190" r="90" fill="#ffffff"/>
+    <circle cx="870" cy="500" r="90" fill="#ffffff"/>
+    <circle cx="560" cy="810" r="90" fill="#ffffff"/>
+    <circle cx="250" cy="500" r="90" fill="#ffffff"/>
+
+    <!-- Rotor blades and hubs. -->
+    <path d="M488 190 H632 M560 118 V262"/>
+    <path d="M798 500 H942 M870 428 V572"/>
+    <path d="M488 810 H632 M560 738 V882"/>
+    <path d="M178 500 H322 M250 428 V572"/>
+    <circle cx="560" cy="190" r="7" fill="#000000"/>
+    <circle cx="870" cy="500" r="7" fill="#000000"/>
+    <circle cx="560" cy="810" r="7" fill="#000000"/>
+    <circle cx="250" cy="500" r="7" fill="#000000"/>
+
+    <!-- Square airframe body and nose reference. -->
+    <rect x="510" y="450" width="100" height="100" fill="#ffffff"/>
+    <path d="M546 476 L560 462 L574 476"/>
+
+    <!-- Body-fixed axes. -->
+    <path d="M560 500 V300" marker-end="url(#arrow)"/>
+    <path d="M560 500 H760" marker-end="url(#arrow)"/>
+
+    <!-- +z_b is into the page (down), represented by circled cross. -->
+    <circle cx="560" cy="500" r="15" fill="#ffffff"/>
+    <path d="M550 490 L570 510 M570 490 L550 510"/>
+
+    <!-- Positive yaw moment about +z_b. -->
+    <path d="M490 574 C510 630 610 630 630 574" marker-end="url(#arrow)"/>
+
+    <!-- Side-view force inset. -->
+    <rect x="1080" y="190" width="400" height="610" fill="#ffffff"/>
+    <path d="M1135 485 H1425"/>
+    <ellipse cx="1140" cy="485" rx="48" ry="10" fill="#ffffff"/>
+    <ellipse cx="1420" cy="485" rx="48" ry="10" fill="#ffffff"/>
+    <rect x="1170" y="460" width="220" height="50" fill="#ffffff"/>
+    <circle cx="1280" cy="485" r="5" fill="#000000"/>
+    <path d="M1280 455 V300" marker-end="url(#arrow)"/>
+    <path d="M1280 515 V690" marker-end="url(#arrow)"/>
+  </g>
+
+  <g fill="#000000" font-family="Arial, Helvetica, sans-serif">
+    <text x="110" y="105" font-size="24" font-weight="700">TOP VIEW</text>
+
+    <text x="560" y="66" text-anchor="middle" font-size="22" font-weight="700">M1 — FRONT</text>
+    <text x="870" y="635" text-anchor="middle" font-size="22" font-weight="700">M2 — RIGHT</text>
+    <text x="560" y="930" text-anchor="middle" font-size="22" font-weight="700">M3 — REAR</text>
+    <text x="125" y="506" text-anchor="end" font-size="22" font-weight="700">M4 — LEFT</text>
+
+    <text x="582" y="312" font-size="22">
+      +x<tspan baseline-shift="sub" font-size="15">b</tspan>
+    </text>
+    <text x="642" y="352" font-size="20">L (roll)</text>
+
+    <text x="716" y="475" font-size="22">
+      +y<tspan baseline-shift="sub" font-size="15">b</tspan>
+    </text>
+    <text x="650" y="545" font-size="20">M (pitch)</text>
+
+    <text x="620" y="522" font-size="22">
+      +z<tspan baseline-shift="sub" font-size="15">b</tspan> down
+    </text>
+    <text x="665" y="625" font-size="20">N (yaw)</text>
+
+    <text x="1105" y="230" font-size="24" font-weight="700">SIDE VIEW</text>
+    <text x="1305" y="315" font-size="22">
+      T = ΣT<tspan baseline-shift="sub" font-size="15">i</tspan>
+    </text>
+    <text x="1305" y="683" font-size="22">mg</text>
+  </g>
+</svg>

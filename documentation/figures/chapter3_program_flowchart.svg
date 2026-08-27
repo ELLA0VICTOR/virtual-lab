@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1400" viewBox="0 0 1000 1400">
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 8 4 L 0 8 Z" fill="#000000"/>
+    </marker>
+    <style>
+      .box { fill:#ffffff; stroke:#000000; stroke-width:2.2; }
+      .line { fill:none; stroke:#000000; stroke-width:2; marker-end:url(#arrow); }
+      .label { font-family:'Times New Roman',serif; font-size:22px; text-anchor:middle; fill:#000000; }
+      .main { font-weight:700; }
+      .small { font-size:18px; }
+      .yn { font-family:'Times New Roman',serif; font-size:18px; font-weight:700; fill:#000000; }
+    </style>
+  </defs>
+  <ellipse class="box" cx="500" cy="55" rx="105" ry="35"/>
+  <text class="label main" x="500" y="63">START</text>
+  <rect class="box" x="285" y="125" width="430" height="75"/>
+  <text class="label main" x="500" y="156">Initialise application</text>
+  <text class="label small" x="500" y="181">Load state, gains and setpoints</text>
+  <path class="box" d="M325 245 H745 L705 325 H285 Z"/>
+  <text class="label main" x="515" y="277">Read learner settings</text>
+  <text class="label small" x="515" y="303">Commands, gains and disturbances</text>
+  <path class="box" d="M500 370 L650 430 L500 490 L350 430 Z"/>
+  <text class="label main" x="500" y="425">Simulation</text>
+  <text class="label main" x="500" y="452">running?</text>
+  <rect class="box" x="725" y="392" width="220" height="76"/>
+  <text class="label main" x="835" y="424">Retain state</text>
+  <text class="label small" x="835" y="450">No physics update</text>
+  <rect class="box" x="285" y="535" width="430" height="72"/>
+  <text class="label main" x="500" y="566">Determine fixed steps</text>
+  <text class="label small" x="500" y="590">Δt = 0.002 s</text>
+  <rect class="box" x="285" y="650" width="430" height="64"/>
+  <text class="label main" x="500" y="690">Read calculated state feedback</text>
+  <rect class="box" x="285" y="752" width="430" height="64"/>
+  <text class="label main" x="500" y="791">Update four PID controllers</text>
+  <rect class="box" x="285" y="854" width="430" height="64"/>
+  <text class="label main" x="500" y="893">Mix and limit motor thrusts</text>
+  <rect class="box" x="285" y="956" width="430" height="76"/>
+  <text class="label main" x="500" y="987">Update quadrotor model</text>
+  <text class="label small" x="500" y="1013">Forces, disturbances and RK4</text>
+  <rect class="box" x="285" y="1070" width="430" height="64"/>
+  <text class="label main" x="500" y="1109">Store history sample when due</text>
+  <path class="box" d="M500 1168 L650 1224 L500 1280 L350 1224 Z"/>
+  <text class="label main" x="500" y="1219">More fixed</text>
+  <text class="label main" x="500" y="1246">steps?</text>
+  <rect class="box" x="700" y="1188" width="245" height="72"/>
+  <text class="label main" x="822" y="1219">Evaluate mission</text>
+  <text class="label small" x="822" y="1244">Metrics and lessons</text>
+  <rect class="box" x="700" y="1300" width="245" height="64"/>
+  <text class="label main" x="822" y="1339">Update visible outputs</text>
+  <path class="line" d="M500 90 V125"/>
+  <path class="line" d="M500 200 V245"/>
+  <path class="line" d="M500 325 V370"/>
+  <path class="line" d="M500 490 V535"/>
+  <path class="line" d="M500 607 V650"/>
+  <path class="line" d="M500 714 V752"/>
+  <path class="line" d="M500 816 V854"/>
+  <path class="line" d="M500 918 V956"/>
+  <path class="line" d="M500 1032 V1070"/>
+  <path class="line" d="M500 1134 V1168"/>
+  <path class="line" d="M650 430 H725"/>
+  <text class="yn" x="674" y="418">No</text>
+  <text class="yn" x="515" y="517">Yes</text>
+  <path class="line" d="M650 1224 H700"/>
+  <text class="yn" x="666" y="1212">No</text>
+  <path class="line" d="M350 1224 H220 V682 H285"/>
+  <text class="yn" x="306" y="1212">Yes</text>
+  <path class="line" d="M822 1260 V1300"/>
+  <path class="line" d="M835 468 H970 V1332 H945"/>
+  <path class="line" d="M700 1332 H120 V285 H285"/>
+</svg>

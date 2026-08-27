@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-08-26T00:00:00.000Z" agent="Codex" version="24.7.17" type="device">
+  <diagram id="pid-feedback" name="PID Feedback Loop">
+    <mxGraphModel dx="1400" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="600" math="0" shadow="0" background="#FFFFFF">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="setpoint" value="Setpoint r(t)" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;glass=0;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontFamily=Arial;fontSize=18;align=center;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="40" y="235" width="160" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="sum" value="Σ" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;shadow=0;glass=0;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontFamily=Arial;fontSize=18;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="250" y="245" width="60" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="plus" value="+" style="text;html=1;strokeColor=none;fillColor=none;shadow=0;fontColor=#000000;fontFamily=Arial;fontSize=18;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="225" y="248" width="24" height="24" as="geometry"/>
+        </mxCell>
+        <mxCell id="minus" value="−" style="text;html=1;strokeColor=none;fillColor=none;shadow=0;fontColor=#000000;fontFamily=Arial;fontSize=18;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="282" y="306" width="24" height="24" as="geometry"/>
+        </mxCell>
+        <mxCell id="pid" value="PID&lt;br&gt;controller" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;glass=0;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontFamily=Arial;fontSize=18;align=center;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="365" y="225" width="180" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="mixer" value="Motor&lt;br&gt;mixer" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;glass=0;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontFamily=Arial;fontSize=18;align=center;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="600" y="225" width="180" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="plant" value="Quadrotor&lt;br&gt;model" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;glass=0;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontFamily=Arial;fontSize=18;align=center;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="850" y="225" width="200" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="disturbances" value="Disturbances d(t)" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;glass=0;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontFamily=Arial;fontSize=18;align=center;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="870" y="70" width="160" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="output" value="Output y(t)" style="rounded=0;whiteSpace=wrap;html=1;shadow=0;glass=0;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontFamily=Arial;fontSize=18;align=center;verticalAlign=middle;spacing=4;" vertex="1" parent="1">
+          <mxGeometry x="1145" y="235" width="160" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge-r" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=2;startArrow=none;endArrow=classic;endFill=1;endSize=6;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="setpoint" target="sum">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-e" value="e(t)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=2;startArrow=none;endArrow=classic;endFill=1;endSize=6;fontColor=#000000;fontFamily=Arial;fontSize=15;labelBackgroundColor=#ffffff;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="sum" target="pid">
+          <mxGeometry x="0" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-u" value="u(t)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=2;startArrow=none;endArrow=classic;endFill=1;endSize=6;fontColor=#000000;fontFamily=Arial;fontSize=15;labelBackgroundColor=#ffffff;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="pid" target="mixer">
+          <mxGeometry x="0" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-thrust" value="f₁ ... f₄" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=2;startArrow=none;endArrow=classic;endFill=1;endSize=6;fontColor=#000000;fontFamily=Arial;fontSize=15;labelBackgroundColor=#ffffff;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="mixer" target="plant">
+          <mxGeometry x="0" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-y" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=2;startArrow=none;endArrow=classic;endFill=1;endSize=6;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="plant" target="output">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-disturbance" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=2;startArrow=none;endArrow=classic;endFill=1;endSize=6;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="disturbances" target="plant">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge-feedback" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=2;startArrow=none;endArrow=classic;endFill=1;endSize=6;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="output" target="sum">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1225" y="455"/>
+              <mxPoint x="280" y="455"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="feedback-label" value="simulated altitude and attitude" style="text;html=1;strokeColor=none;fillColor=#ffffff;shadow=0;fontColor=#000000;fontFamily=Arial;fontSize=15;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry x="550" y="428" width="350" height="25" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

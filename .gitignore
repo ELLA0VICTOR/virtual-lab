@@ -29,3 +29,17 @@ playwright-*.png
 playwright-report
 test-results
 vite-dev.*
+
+# Local agent, cache, and reinstall artifacts
+.agents/
+.codex/
+.local-cache/
+.codex-ui-fidelity-pass.ps1
+roo-code-settings.json
+incident-reports/
+
+# Temporary Python dependency targets and bytecode
+docx_edit/
+docx_fix/
+__pycache__/
+*.py[cod]
